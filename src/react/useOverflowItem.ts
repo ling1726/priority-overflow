@@ -1,19 +1,23 @@
 import * as React from "react";
-import { overflowAttr, overflowPriorityAttr } from "./useOverflowContainer";
+import { useOverflowContext } from "./overflowContext";
 export function useOverflowItem(id: string | number, priority?: number) {
   const ref = React.useRef<HTMLElement>();
-  const callbackRef = React.useCallback(
-    (node: HTMLElement) => {
-      if (node) {
-        ref.current = node;
-        ref.current.setAttribute(overflowAttr, id + "");
-        if (priority) {
-          ref.current.setAttribute(overflowPriorityAttr, priority + "");
-        }
-      }
-    },
-    [id, priority]
-  );
+  const registerItem = useOverflowContext((v) => v.registerItem);
+  const deregisterItem = useOverflowContext((v) => v.deregisterItem);
 
-  return callbackRef as unknown as React.MutableRefObject<any>;
+  React.useLayoutEffect(() => {
+    if (ref.current) {
+      registerItem({
+        element: ref.current,
+        id: id + "",
+        priority: priority ?? 0,
+      });
+    }
+
+    return () => {
+      deregisterItem(id);
+    };
+  }, [id, priority, registerItem, deregisterItem]);
+
+  return ref as unknown as React.MutableRefObject<any>;
 }

@@ -3,7 +3,7 @@ import { PriorityQueue } from "./priorityQueue";
 export interface OverflowItemEntry {
   element: HTMLElement;
   /**
-   * Higher priority items become invisible later
+   * Lower priority items are invisible first when the container is overflowed
    */
   priority: number;
   id: string;
@@ -24,20 +24,13 @@ export class OverflowManager {
   private visibleItemQueue: PriorityQueue<string>;
   private invisibleItemQueue: PriorityQueue<string>;
   private overflowItems: Record<string, OverflowItemEntry> = {};
-  private container: HTMLElement;
-  private sentinel: HTMLElement;
+  private container?: HTMLElement;
+  private sentinel?: HTMLElement;
   private resizeObserver: ResizeObserver;
   private eventTarget: EventTarget = new EventTarget();
   private resizeTimeout: number = 0;
 
-  constructor(
-    container: HTMLElement,
-    sentinel: HTMLElement,
-    targetWindow: Window
-  ) {
-    this.container = container;
-    this.sentinel = sentinel;
-
+  constructor() {
     this.visibleItemQueue = this.initVisibleItemQueue();
     this.invisibleItemQueue = this.initInvisibleItemQueue();
     this.resizeObserver = this.initResizeObserver();
@@ -45,19 +38,21 @@ export class OverflowManager {
     // When the window resizes jiggle the width to force the resize observer
     // to trigger. Useful for cases where there is no overflow menu before
     // a sudden browser resize
-    targetWindow.addEventListener("resize", () => {
-      const origWidth = container.getBoundingClientRect().width;
+    // targetWindow.addEventListener("resize", () => {
+    //   const origWidth = container.getBoundingClientRect().width;
 
-      container.style.width = `${origWidth + 1}px`;
-      this.resizeTimeout = setTimeout(() => (container.style.width = ""));
-    });
+    //   container.style.width = `${origWidth + 1}px`;
+    //   this.resizeTimeout = setTimeout(() => (container.style.width = ""));
+    // });
   }
 
   public start() {
-    this.resizeObserver.observe(this.container);
+    if (this.container) {
+      this.resizeObserver.observe(this.container);
+    }
   }
 
-  public dispose() {
+  public stop() {
     this.resizeObserver.disconnect();
     clearTimeout(this.resizeTimeout);
   }
@@ -81,6 +76,14 @@ export class OverflowManager {
 
   public addEventListener(func: OverflowEventHandler) {
     this.eventTarget.addEventListener(EVENT_NAME, func as EventListener);
+  }
+
+  public setContainer(container: HTMLElement) {
+    this.container = container;
+  }
+
+  public setSentinel(sentinel: HTMLElement) {
+    this.sentinel = sentinel;
   }
 
   private initResizeObserver() {

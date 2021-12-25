@@ -54,7 +54,7 @@ const OverflowMenu: React.FC<{ itemIds: string[] | number[] }> = ({
       <MenuPopover>
         <MenuList>
           {itemIds.map((i) => (
-            <TestOverflowMenuItem id={i} />
+            <TestOverflowMenuItem key={i} id={i} />
           ))}
         </MenuList>
       </MenuPopover>

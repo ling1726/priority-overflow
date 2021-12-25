@@ -17,7 +17,9 @@ export const useOverflowContainer = (update: OnUpdateOverflow) => {
   const containerRef = React.useRef<HTMLDivElement>(null);
   // DOM ref to a spacer element, used to detect available space at the end of the container
   const sentinelRef = React.useRef<HTMLDivElement>(null);
-  const overflowManagerRef = React.useRef<OverflowManager>();
+  const overflowManagerRef = React.useRef<OverflowManager>(
+    new OverflowManager()
+  );
 
   const updateOverflowItems = useEventCallback(update);
 
@@ -30,75 +32,17 @@ export const useOverflowContainer = (update: OnUpdateOverflow) => {
       return;
     }
 
-    overflowManagerRef.current = new OverflowManager(
-      containerRef.current,
-      sentinelRef.current,
-      targetDocument?.defaultView
-    );
     const overflowManager = overflowManagerRef.current;
+    overflowManager.setContainer(containerRef.current);
+    overflowManager.setSentinel(sentinelRef.current);
     overflowManager.addEventListener((e) => {
       updateOverflowItems(e.detail.visibleItems, e.detail.invisibleItems);
     });
 
-    const mutationObserver = new MutationObserver((mutationList) => {
-      const shouldObserve = (el: HTMLElement) => {
-        return el.hasAttribute && el.hasAttribute(overflowAttr);
-      };
-
-      mutationList.forEach((mutation) => {
-        mutation.removedNodes.forEach((node) => {
-          const el = node as HTMLElement;
-          if (shouldObserve(el)) {
-            const itemId = el.getAttribute(overflowAttr)!;
-            overflowManager.removeItem(itemId);
-          }
-        });
-
-        mutation.addedNodes.forEach((node) => {
-          const el = node as HTMLElement;
-          if (shouldObserve(el)) {
-            const itemId = el.getAttribute(overflowAttr)!;
-            const priority = parseInt(
-              el.getAttribute(overflowPriorityAttr) ?? "0"
-            );
-
-            overflowManager.addItems({
-              element: el,
-              priority,
-              id: itemId,
-            });
-          }
-        });
-      });
-    });
-
-    if (containerRef.current) {
-      const initial = containerRef.current.querySelectorAll(
-        `[${overflowAttr}]`
-      );
-      Array.from(initial).forEach((el: Element) => {
-        const itemId = el.getAttribute(overflowAttr)!;
-        const priority = parseInt(el.getAttribute(overflowPriorityAttr) ?? "0");
-        if (!overflowManager.hasItem(itemId)) {
-          overflowManager.addItems({
-            element: el as HTMLElement,
-            priority,
-            id: itemId,
-          });
-        }
-      });
-    }
-
     overflowManager.start();
-    if (containerRef.current) {
-      mutationObserver.observe(containerRef.current, {
-        childList: true,
-        subtree: true,
-      });
-    }
+
     return () => {
-      mutationObserver.disconnect();
-      overflowManager.dispose();
+      overflowManager.stop();
     };
   }, [updateOverflowItems, targetDocument]);
 
@@ -112,5 +56,18 @@ export const useOverflowContainer = (update: OnUpdateOverflow) => {
     }
   }, []);
 
-  return { containerRef, sentinelRef };
+  const registerItem = React.useCallback((item: OverflowItemEntry) => {
+    if (overflowManagerRef.current) {
+      console.log(item);
+      overflowManagerRef.current.addItems(item);
+    }
+  }, []);
+
+  const deregisterItem = React.useCallback((itemId: string | number) => {
+    if (overflowManagerRef.current) {
+      overflowManagerRef.current.removeItem(itemId + "");
+    }
+  }, []);
+
+  return { containerRef, sentinelRef, registerItem, deregisterItem };
 };

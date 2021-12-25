@@ -18,23 +18,26 @@ export const Overflow: React.FC = (props) => {
   const [itemVisiblity, setItemVisibility] = React.useState<
     Record<string, boolean>
   >({});
-  const { containerRef, sentinelRef } = useOverflowContainer(
-    (visibleItems, invisibleItems) => {
+  const { containerRef, sentinelRef, registerItem, deregisterItem } =
+    useOverflowContainer((visibleItems, invisibleItems) => {
       setHasOverflow(() => invisibleItems.length > 0);
       setItemVisibility(() => {
         const newState: Record<string, boolean> = {};
         visibleItems.forEach((x) => (newState[x.id] = true));
         invisibleItems.forEach((x) => (newState[x.id] = false));
 
-        console.log(newState);
         return newState;
       });
-    }
-  );
+    });
 
   return (
     <OverflowContext.Provider
-      value={{ itemVisibility: itemVisiblity, hasOverflow }}
+      value={{
+        itemVisibility: itemVisiblity,
+        hasOverflow,
+        registerItem,
+        deregisterItem,
+      }}
     >
       <div ref={containerRef} className={styles.container}>
         {props.children}
