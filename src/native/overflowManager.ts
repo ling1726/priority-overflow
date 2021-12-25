@@ -248,14 +248,14 @@ export class OverflowManager {
         return priority;
       }
 
-      const positionComparer =
+      const positionStatusBit =
         this.overflowDirection === "end"
           ? Node.DOCUMENT_POSITION_FOLLOWING
           : Node.DOCUMENT_POSITION_PRECEDING;
 
       // equal priority, use DOM order
       if (
-        itemA.element.compareDocumentPosition(itemB.element) & positionComparer
+        itemA.element.compareDocumentPosition(itemB.element) & positionStatusBit
       ) {
         return -1;
       } else {
@@ -274,14 +274,14 @@ export class OverflowManager {
         return priority;
       }
 
-      const positionComparer =
+      const positionStatusBit =
         this.overflowDirection === "end"
           ? Node.DOCUMENT_POSITION_PRECEDING
           : Node.DOCUMENT_POSITION_FOLLOWING;
 
       // equal priority, use DOM order
       if (
-        itemA.element.compareDocumentPosition(itemB.element) & positionComparer
+        itemA.element.compareDocumentPosition(itemB.element) & positionStatusBit
       ) {
         return -1;
       } else {
