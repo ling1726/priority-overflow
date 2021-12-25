@@ -22,10 +22,10 @@ export const Overflow: React.FC<{ overflowDirection?: OverflowDirection }> = (
     Record<string, boolean>
   >({});
 
-  const updateItemVisibility: OnUpdateOverflow = (
+  const updateItemVisibility: OnUpdateOverflow = ({
     visibleItems,
-    invisibleItems
-  ) => {
+    invisibleItems,
+  }) => {
     setHasOverflow(() => invisibleItems.length > 0);
     setItemVisibility(() => {
       const newState: Record<string, boolean> = {};

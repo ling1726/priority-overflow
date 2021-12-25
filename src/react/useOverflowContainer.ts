@@ -11,10 +11,14 @@ import { useEventCallback } from "../utils/useEventCallback";
 export const overflowAttr = "data-overflow-item";
 export const overflowPriorityAttr = "data-overflow-priority";
 
-export type OnUpdateOverflow = (
-  visibleItems: OverflowItemEntry[],
-  invisibleItems: OverflowItemEntry[]
-) => void;
+export interface OnUpdateOverflowData {
+  visibleItems: OverflowItemEntry[];
+  invisibleItems: OverflowItemEntry[];
+  startItem?: OverflowItemEntry;
+  endItem?: OverflowItemEntry;
+}
+
+export type OnUpdateOverflow = (data: OnUpdateOverflowData) => void;
 
 export const useOverflowContainer = (
   update: OnUpdateOverflow,
@@ -45,7 +49,10 @@ export const useOverflowContainer = (
     overflowManager.container = containerRef.current;
     overflowManager.sentinel = sentinelRef.current;
     const listener: OverflowEventHandler = (e) => {
-      updateOverflowItems(e.detail.visibleItems, e.detail.invisibleItems);
+      updateOverflowItems({
+        visibleItems: e.detail.visibleItems,
+        invisibleItems: e.detail.invisibleItems,
+      });
     };
     overflowManager.addEventListener(listener);
 

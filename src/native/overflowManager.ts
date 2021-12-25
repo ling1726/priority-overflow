@@ -1,6 +1,7 @@
 import { PriorityQueue } from "./priorityQueue";
 
 export type OverflowDirection = "start" | "end";
+export const OVERFLOW_ITEM_DATA = "data-overflow-item";
 export interface OverflowItemEntry {
   /**
    * HTML element that will be disappear when overflowed
@@ -90,6 +91,7 @@ export class OverflowManager {
    */
   public start() {
     if (this.container) {
+      this.dispatchOverflowUpdate();
       this.resizeObserver.observe(this.container);
       this.mutationObserver.observe(this.container, { childList: true });
     }
@@ -110,6 +112,7 @@ export class OverflowManager {
    */
   public addItems(...items: OverflowItemEntry[]) {
     items.forEach((item) => {
+      item.element.setAttribute(OVERFLOW_ITEM_DATA, item.id);
       this.overflowItems[item.id] = item;
       this.visibleItemQueue.enqueue(item.id);
     });
@@ -129,6 +132,7 @@ export class OverflowManager {
    * @param itemId
    */
   public removeItem(itemId: string) {
+    this.overflowItems[itemId].element.removeAttribute(OVERFLOW_ITEM_DATA);
     delete this.overflowItems[itemId];
     this.visibleItemQueue.remove(itemId);
     this.invisibleItemQueue.remove(itemId);
@@ -207,23 +211,27 @@ export class OverflowManager {
         this.visibleItemQueue.peek() !== visibleTop ||
         this.invisibleItemQueue.peek() !== invisibleTop
       ) {
-        const visibleItemIds = this.visibleItemQueue.all();
-        const invisibleItemIds = this.invisibleItemQueue.all();
-
-        const visibleItems = visibleItemIds.map(
-          (itemId) => this.overflowItems[itemId]
-        );
-        const invisibleItems = invisibleItemIds.map(
-          (itemId) => this.overflowItems[itemId]
-        );
-
-        this.eventTarget.dispatchEvent(
-          new CustomEvent<OverflowEventPayload>(EVENT_NAME, {
-            detail: { visibleItems, invisibleItems },
-          })
-        );
+        this.dispatchOverflowUpdate();
       }
     });
+  }
+
+  private dispatchOverflowUpdate() {
+    const visibleItemIds = this.visibleItemQueue.all();
+    const invisibleItemIds = this.invisibleItemQueue.all();
+
+    const visibleItems = visibleItemIds.map(
+      (itemId) => this.overflowItems[itemId]
+    );
+    const invisibleItems = invisibleItemIds.map(
+      (itemId) => this.overflowItems[itemId]
+    );
+
+    this.eventTarget.dispatchEvent(
+      new CustomEvent<OverflowEventPayload>(EVENT_NAME, {
+        detail: { visibleItems, invisibleItems },
+      })
+    );
   }
 
   private initInvisibleItemQueue() {
