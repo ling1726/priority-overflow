@@ -29,26 +29,19 @@ export class OverflowManager {
   private resizeObserver: ResizeObserver;
   private eventTarget: EventTarget = new EventTarget();
   private resizeTimeout: number = 0;
+  private mutationObserver: MutationObserver;
 
   constructor() {
     this.visibleItemQueue = this.initVisibleItemQueue();
     this.invisibleItemQueue = this.initInvisibleItemQueue();
     this.resizeObserver = this.initResizeObserver();
-
-    // When the window resizes jiggle the width to force the resize observer
-    // to trigger. Useful for cases where there is no overflow menu before
-    // a sudden browser resize
-    // targetWindow.addEventListener("resize", () => {
-    //   const origWidth = container.getBoundingClientRect().width;
-
-    //   container.style.width = `${origWidth + 1}px`;
-    //   this.resizeTimeout = setTimeout(() => (container.style.width = ""));
-    // });
+    this.mutationObserver = this.initMutationObserver();
   }
 
   public start() {
     if (this.container) {
       this.resizeObserver.observe(this.container);
+      this.mutationObserver.observe(this.container, { childList: true });
     }
   }
 
@@ -88,6 +81,21 @@ export class OverflowManager {
 
   public setSentinel(sentinel: HTMLElement) {
     this.sentinel = sentinel;
+  }
+
+  private initMutationObserver() {
+    // Adding removing children DOM nodes can affect overflow
+    // When this happens just 'jiggle' the width of the container to trigger the resize observer
+    return new MutationObserver(() => {
+      if (!this.container) {
+        return;
+      }
+
+      const origWidth = this.container.getBoundingClientRect().width;
+
+      this.container.style.width = `${origWidth + 1}px`;
+      this.resizeTimeout = setTimeout(() => (this.container!.style.width = ""));
+    });
   }
 
   private initResizeObserver() {
