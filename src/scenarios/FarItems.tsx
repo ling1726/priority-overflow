@@ -8,13 +8,27 @@ import {
   MenuTrigger,
 } from "@fluentui/react-components";
 import { Overflow } from "../react/Overflow";
+import { TestOverflowItem } from "../utils/TestOverflowItem";
 import { TestOverflowMenuItem } from "../utils/TestOverflowMenuItem";
 import { useOverflowContext } from "../react/overflowContext";
-import { TestOverflowDividerItem } from "../utils/TestOverflowDividerItem";
 
 const useStyles = makeStyles({
   container: {
     textAlign: "center",
+  },
+
+  exampleContainer: {
+    display: "flex",
+    justifyContent: "space-between",
+  },
+
+  overflowContainer: {
+    flexGrow: 1,
+  },
+
+  farItems: {
+    dislay: "flex",
+    gap: "4px",
   },
 });
 
@@ -24,13 +38,20 @@ function App() {
 
   return (
     <div className={styles.container}>
-      <h2>Rendering dividers</h2>
-      <Overflow>
-        {itemIds.map((_, i) => (
-          <TestOverflowDividerItem key={i} id={i} />
-        ))}
-        <OverflowMenu itemIds={itemIds} />
-      </Overflow>
+      <h2>Far items</h2>
+      <div className={styles.exampleContainer}>
+        <Overflow className={styles.overflowContainer}>
+          {itemIds.map((_, i) => (
+            <TestOverflowItem key={i} id={i} />
+          ))}
+          <OverflowMenu itemIds={itemIds} />
+        </Overflow>
+
+        <div className={styles.farItems}>
+          <Button>Foo</Button>
+          <Button>Bar</Button>
+        </div>
+      </div>
     </div>
   );
 }

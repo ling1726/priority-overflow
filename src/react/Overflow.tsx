@@ -1,5 +1,5 @@
 import React from "react";
-import { makeStyles } from "@fluentui/react-components";
+import { makeStyles, mergeClasses } from "@fluentui/react-components";
 import { OnUpdateOverflow, useOverflowContainer } from "./useOverflowContainer";
 import { OverflowContext } from "./overflowContext";
 import { OverflowDirection } from "../native/overflowManager";
@@ -13,9 +13,10 @@ const useStyles = makeStyles({
   },
 });
 
-export const Overflow: React.FC<{ overflowDirection?: OverflowDirection }> = (
-  props
-) => {
+export const Overflow: React.FC<{
+  overflowDirection?: OverflowDirection;
+  className?: string;
+}> = (props) => {
   const styles = useStyles();
   const [hasOverflow, setHasOverflow] = React.useState(false);
   const [itemVisiblity, setItemVisibility] = React.useState<
@@ -48,7 +49,10 @@ export const Overflow: React.FC<{ overflowDirection?: OverflowDirection }> = (
         deregisterItem,
       }}
     >
-      <div ref={containerRef} className={styles.container}>
+      <div
+        ref={containerRef}
+        className={mergeClasses(styles.container, props.className)}
+      >
         {props.children}
         <div style={{ width: 1 }} ref={sentinelRef} />
       </div>
