@@ -76,13 +76,13 @@ export class OverflowManager {
   /**
    * Watches for changes to container children elements
    */
-  private mutationObserver: MutationObserver;
+  private intersectionObserver: IntersectionObserver;
 
   constructor(overflowDirection: OverflowDirection = "end") {
     this.visibleItemQueue = this.initVisibleItemQueue();
     this.invisibleItemQueue = this.initInvisibleItemQueue();
     this.resizeObserver = this.initResizeObserver();
-    this.mutationObserver = this.initMutationObserver();
+    this.intersectionObserver = this.initIntersectionObserver();
     this.overflowDirection = overflowDirection;
   }
 
@@ -93,7 +93,10 @@ export class OverflowManager {
     if (this.container) {
       this.dispatchOverflowUpdate();
       this.resizeObserver.observe(this.container);
-      this.mutationObserver.observe(this.container, { childList: true });
+    }
+
+    if (this.sentinel) {
+      this.intersectionObserver.observe(this.sentinel);
     }
   }
 
@@ -102,7 +105,7 @@ export class OverflowManager {
    */
   public stop() {
     this.resizeObserver.disconnect();
-    this.mutationObserver.disconnect();
+    this.intersectionObserver.disconnect();
     clearTimeout(this.resizeTimeout);
   }
 
@@ -152,23 +155,25 @@ export class OverflowManager {
     this.eventTarget.removeEventListener(EVENT_NAME, func as EventListener);
   }
 
-  private initMutationObserver() {
+  private initIntersectionObserver() {
     // Adding removing children DOM nodes can affect overflow (i.e. sudden overflow menu button appearing)
     // When this happens just 'jiggle' the width of the container to trigger the resize observer
-    return new MutationObserver(() => {
-      if (!this.container) {
-        return;
-      }
+    return new IntersectionObserver(
+      () => {
+        if (!this.container) {
+          return;
+        }
 
-      clearTimeout(this.resizeTimeout);
-      const origWidth = this.container.getBoundingClientRect().width;
+        clearTimeout(this.resizeTimeout);
+        const origWidth = this.container.getBoundingClientRect().width;
 
-      this.container.style.width = `${origWidth + 1}px`;
-      this.resizeTimeout = setTimeout(
-        () => (this.container!.style.width = ""),
-        100
-      );
-    });
+        this.container.style.width = `${origWidth - 1}px`;
+        this.resizeTimeout = setTimeout(() => {
+          this.container!.style.width = "";
+        }, 100);
+      },
+      { root: this.container, threshold: 1 }
+    );
   }
 
   private initResizeObserver() {

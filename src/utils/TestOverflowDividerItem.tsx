@@ -21,8 +21,9 @@ export const TestOverflowDividerItem: React.FC<TestOverflowItemProps> = (
 
   return (
     <>
-      <TestOverflowItem {...props} />
-      {isVisible && <div className={styles.divider} />}
+      <TestOverflowItem {...props}>
+        {isVisible && <div className={styles.divider} />}
+      </TestOverflowItem>
     </>
   );
 };

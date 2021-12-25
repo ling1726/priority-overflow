@@ -1,10 +1,24 @@
-import { Button } from "@fluentui/react-components";
+import { Button, makeStyles } from "@fluentui/react-components";
 import * as React from "react";
 import { useOverflowItem } from "../react/useOverflowItem";
-export const TestOverflowItem: React.FC<TestOverflowItemProps> = (props) => {
-  const ref = useOverflowItem<HTMLButtonElement>(props.id, props.priority);
 
-  return <Button ref={ref}>Item {props.id}</Button>;
+const useStyles = makeStyles({
+  container: {
+    display: "flex",
+    marginRight: "4px",
+  },
+});
+
+export const TestOverflowItem: React.FC<TestOverflowItemProps> = (props) => {
+  const ref = useOverflowItem<HTMLDivElement>(props.id, props.priority);
+  const styles = useStyles();
+
+  return (
+    <div ref={ref} className={styles.container}>
+      <Button>Item {props.id}</Button>
+      {props.children}
+    </div>
+  );
 };
 
 export interface TestOverflowItemProps {
