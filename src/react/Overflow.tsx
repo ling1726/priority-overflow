@@ -1,0 +1,45 @@
+import React from "react";
+import { makeStyles } from "@fluentui/react-components";
+import { useOverflowContainer } from "./useOverflowContainer";
+import { OverflowContext } from "./overflowContext";
+
+const useStyles = makeStyles({
+  container: {
+    display: "flex",
+    flexWrap: "nowrap",
+    minWidth: 0,
+    overflow: "hidden",
+  },
+});
+
+export const Overflow: React.FC = (props) => {
+  const styles = useStyles();
+  const [hasOverflow, setHasOverflow] = React.useState(false);
+  const [itemVisiblity, setItemVisibility] = React.useState<
+    Record<string, boolean>
+  >({});
+  const { containerRef, sentinelRef } = useOverflowContainer(
+    (visibleItems, invisibleItems) => {
+      setHasOverflow(() => invisibleItems.length > 0);
+      setItemVisibility(() => {
+        const newState: Record<string, boolean> = {};
+        visibleItems.forEach((x) => (newState[x.id] = true));
+        invisibleItems.forEach((x) => (newState[x.id] = false));
+
+        console.log(newState);
+        return newState;
+      });
+    }
+  );
+
+  return (
+    <OverflowContext.Provider
+      value={{ itemVisibility: itemVisiblity, hasOverflow }}
+    >
+      <div ref={containerRef} className={styles.container}>
+        {props.children}
+        <div style={{ width: 1 }} ref={sentinelRef} />
+      </div>
+    </OverflowContext.Provider>
+  );
+};
