@@ -74,7 +74,7 @@ export class OverflowManager {
    */
   private resizeObserver: ResizeObserver;
   /**
-   * Watches for changes to container children elements
+   * Watches for when the sentinel is no longer visible
    */
   private intersectionObserver: IntersectionObserver;
 
