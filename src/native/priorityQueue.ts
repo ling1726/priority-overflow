@@ -1,3 +1,6 @@
+/**
+ * Priority queue implemented with a min heap
+ */
 export class PriorityQueue<T> {
   public arr: T[] = [];
   private compare: (a: T, b: T) => number;

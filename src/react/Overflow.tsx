@@ -1,6 +1,6 @@
 import React from "react";
 import { makeStyles } from "@fluentui/react-components";
-import { useOverflowContainer } from "./useOverflowContainer";
+import { OnUpdateOverflow, useOverflowContainer } from "./useOverflowContainer";
 import { OverflowContext } from "./overflowContext";
 import { OverflowDirection } from "../native/overflowManager";
 
@@ -21,17 +21,23 @@ export const Overflow: React.FC<{ overflowDirection?: OverflowDirection }> = (
   const [itemVisiblity, setItemVisibility] = React.useState<
     Record<string, boolean>
   >({});
-  const { containerRef, sentinelRef, registerItem, deregisterItem } =
-    useOverflowContainer((visibleItems, invisibleItems) => {
-      setHasOverflow(() => invisibleItems.length > 0);
-      setItemVisibility(() => {
-        const newState: Record<string, boolean> = {};
-        visibleItems.forEach((x) => (newState[x.id] = true));
-        invisibleItems.forEach((x) => (newState[x.id] = false));
 
-        return newState;
-      });
-    }, props.overflowDirection);
+  const updateItemVisibility: OnUpdateOverflow = (
+    visibleItems,
+    invisibleItems
+  ) => {
+    setHasOverflow(() => invisibleItems.length > 0);
+    setItemVisibility(() => {
+      const newState: Record<string, boolean> = {};
+      visibleItems.forEach((x) => (newState[x.id] = true));
+      invisibleItems.forEach((x) => (newState[x.id] = false));
+
+      return newState;
+    });
+  };
+
+  const { containerRef, sentinelRef, registerItem, deregisterItem } =
+    useOverflowContainer(updateItemVisibility, props.overflowDirection);
 
   return (
     <OverflowContext.Provider

@@ -5,7 +5,7 @@ export const TestOverflowItem: React.FC<{
   id: string | number;
   priority?: number;
 }> = (props) => {
-  const ref = useOverflowItem(props.id, props.priority);
+  const ref = useOverflowItem<HTMLButtonElement>(props.id, props.priority);
 
   return <Button ref={ref}>Item {props.id}</Button>;
 };

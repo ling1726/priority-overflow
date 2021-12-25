@@ -1,7 +1,11 @@
 import * as React from "react";
 import { useOverflowContext } from "./overflowContext";
-export function useOverflowItem(id: string | number, priority?: number) {
-  const ref = React.useRef<HTMLElement>();
+
+export function useOverflowItem<TElement extends HTMLElement>(
+  id: string | number,
+  priority?: number
+) {
+  const ref = React.useRef<TElement>(null);
   const registerItem = useOverflowContext((v) => v.registerItem);
   const deregisterItem = useOverflowContext((v) => v.deregisterItem);
 
@@ -19,5 +23,5 @@ export function useOverflowItem(id: string | number, priority?: number) {
     };
   }, [id, priority, registerItem, deregisterItem]);
 
-  return ref as unknown as React.MutableRefObject<any>;
+  return ref;
 }
