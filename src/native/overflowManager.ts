@@ -1,18 +1,30 @@
 import { PriorityQueue } from "./priorityQueue";
 
 export interface OverflowItemEntry {
+  /**
+   * HTML element that will be disappear when overflowed
+   */
   element: HTMLElement;
   /**
    * Lower priority items are invisible first when the container is overflowed
    */
   priority: number;
+  /**
+   * Specific id, used to track visibility and provide updates to consumers
+   */
   id: string;
 }
 
+/**
+ * signature similar to standard event listeners, but typed to handle the custom event
+ */
 export type OverflowEventHandler = (
   e: CustomEvent<OverflowEventPayload>
 ) => void;
 
+/**
+ * Payload of the custom DOM event for overflow updates
+ */
 export interface OverflowEventPayload {
   visibleItems: OverflowItemEntry[];
   invisibleItems: OverflowItemEntry[];
@@ -21,14 +33,41 @@ export interface OverflowEventPayload {
 const EVENT_NAME = "overflow";
 
 export class OverflowManager {
+  /**
+   * Priority queue of visible items to overflow
+   */
   private visibleItemQueue: PriorityQueue<string>;
+  /**
+   * Priority queue of invisible items to display when there is space
+   */
   private invisibleItemQueue: PriorityQueue<string>;
+  /**
+   * Collection of all managed overflow items
+   */
   private overflowItems: Record<string, OverflowItemEntry> = {};
+  /**
+   * Contains all overflow items
+   */
   private container?: HTMLElement;
+  /**
+   * Invisible element used to detect overflow
+   */
   private sentinel?: HTMLElement;
-  private resizeObserver: ResizeObserver;
+  /**
+   * Used to subscribe to item visibility updates
+   */
   private eventTarget: EventTarget = new EventTarget();
+  /**
+   * Async timeout to resize the container
+   */
   private resizeTimeout: number = 0;
+  /**
+   * Watches for changes to container size
+   */
+  private resizeObserver: ResizeObserver;
+  /**
+   * Watches for changes to container children elements
+   */
   private mutationObserver: MutationObserver;
 
   constructor() {
@@ -38,6 +77,9 @@ export class OverflowManager {
     this.mutationObserver = this.initMutationObserver();
   }
 
+  /**
+   * Start observing container size and child elements and manages overflow item visiblity
+   */
   public start() {
     if (this.container) {
       this.resizeObserver.observe(this.container);
@@ -45,11 +87,19 @@ export class OverflowManager {
     }
   }
 
+  /**
+   * Stops observing container size and child elements
+   */
   public stop() {
     this.resizeObserver.disconnect();
+    this.mutationObserver.disconnect();
     clearTimeout(this.resizeTimeout);
   }
 
+  /**
+   * Adds a new item to manage
+   * @param items - New item to manage
+   */
   public addItems(...items: OverflowItemEntry[]) {
     items.forEach((item) => {
       this.overflowItems[item.id] = item;
@@ -57,28 +107,49 @@ export class OverflowManager {
     });
   }
 
+  /**
+   * @param itemId
+   * @returns Whether manager contains an item
+   */
   public hasItem(itemId: string) {
     return !!this.overflowItems[itemId];
   }
 
+  /**
+   * Removes item from the overflow manager.
+   * Should be called when element is removed from DOM.
+   * @param itemId
+   */
   public removeItem(itemId: string) {
     delete this.overflowItems[itemId];
     this.visibleItemQueue.remove(itemId);
     this.invisibleItemQueue.remove(itemId);
   }
 
+  /**
+   * @param func - Handles item visibility updates
+   */
   public addEventListener(func: OverflowEventHandler) {
     this.eventTarget.addEventListener(EVENT_NAME, func as EventListener);
   }
 
+  /**
+   * @param func - Reference to the event handler to remove
+   */
   public removeEventListener(func: OverflowEventHandler) {
     this.eventTarget.removeEventListener(EVENT_NAME, func as EventListener);
   }
 
+  /**
+   * @param container - contains overflow elements
+   */
   public setContainer(container: HTMLElement) {
     this.container = container;
   }
 
+  /**
+   * @param sentinel - Used to subscribe to item visibility updates
+   */
   public setSentinel(sentinel: HTMLElement) {
     this.sentinel = sentinel;
   }
@@ -91,6 +162,7 @@ export class OverflowManager {
         return;
       }
 
+      clearTimeout(this.resizeTimeout);
       const origWidth = this.container.getBoundingClientRect().width;
 
       this.container.style.width = `${origWidth + 1}px`;
