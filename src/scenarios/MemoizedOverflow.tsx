@@ -26,6 +26,7 @@ function App() {
 
   return (
     <div className={styles.container}>
+      <h2>Memoized overflow items</h2>
       <Overflow>
         {itemIds.map((_, i) => (
           <TestOverflowItem key={i} id={i} />
