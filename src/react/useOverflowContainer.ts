@@ -69,7 +69,6 @@ export const useOverflowContainer = (
 
   const registerItem = React.useCallback((item: OverflowItemEntry) => {
     if (overflowManagerRef.current) {
-      console.log(item);
       overflowManagerRef.current.addItems(item);
     }
   }, []);

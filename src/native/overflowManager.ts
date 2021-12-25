@@ -149,7 +149,7 @@ export class OverflowManager {
   }
 
   private initMutationObserver() {
-    // Adding removing children DOM nodes can affect overflow (i.e. sudden overflow menu appearing)
+    // Adding removing children DOM nodes can affect overflow (i.e. sudden overflow menu button appearing)
     // When this happens just 'jiggle' the width of the container to trigger the resize observer
     return new MutationObserver(() => {
       if (!this.container) {
@@ -160,7 +160,10 @@ export class OverflowManager {
       const origWidth = this.container.getBoundingClientRect().width;
 
       this.container.style.width = `${origWidth + 1}px`;
-      this.resizeTimeout = setTimeout(() => (this.container!.style.width = ""));
+      this.resizeTimeout = setTimeout(
+        () => (this.container!.style.width = ""),
+        100
+      );
     });
   }
 
