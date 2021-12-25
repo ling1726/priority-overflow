@@ -84,7 +84,7 @@ export class OverflowManager {
   }
 
   private initMutationObserver() {
-    // Adding removing children DOM nodes can affect overflow
+    // Adding removing children DOM nodes can affect overflow (i.e. sudden overflow menu appearing)
     // When this happens just 'jiggle' the width of the container to trigger the resize observer
     return new MutationObserver(() => {
       if (!this.container) {
