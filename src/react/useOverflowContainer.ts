@@ -1,6 +1,10 @@
 import { useFluent } from "@fluentui/react-components";
 import React from "react";
-import { OverflowItemEntry, OverflowManager } from "../native/overflowManager";
+import {
+  OverflowEventHandler,
+  OverflowItemEntry,
+  OverflowManager,
+} from "../native/overflowManager";
 import { useEventCallback } from "../utils/useEventCallback";
 
 export const overflowAttr = "data-overflow-item";
@@ -35,14 +39,16 @@ export const useOverflowContainer = (update: OnUpdateOverflow) => {
     const overflowManager = overflowManagerRef.current;
     overflowManager.setContainer(containerRef.current);
     overflowManager.setSentinel(sentinelRef.current);
-    overflowManager.addEventListener((e) => {
+    const listener: OverflowEventHandler = (e) => {
       updateOverflowItems(e.detail.visibleItems, e.detail.invisibleItems);
-    });
+    };
+    overflowManager.addEventListener(listener);
 
     overflowManager.start();
 
     return () => {
       overflowManager.stop();
+      overflowManager.removeEventListener(listener);
     };
   }, [updateOverflowItems, targetDocument]);
 

@@ -78,6 +78,10 @@ export class OverflowManager {
     this.eventTarget.addEventListener(EVENT_NAME, func as EventListener);
   }
 
+  public removeEventListener(func: OverflowEventHandler) {
+    this.eventTarget.removeEventListener(EVENT_NAME, func as EventListener);
+  }
+
   public setContainer(container: HTMLElement) {
     this.container = container;
   }
