@@ -2,6 +2,7 @@ import React from "react";
 import { makeStyles } from "@fluentui/react-components";
 import { useOverflowContainer } from "./useOverflowContainer";
 import { OverflowContext } from "./overflowContext";
+import { OverflowDirection } from "../native/overflowManager";
 
 const useStyles = makeStyles({
   container: {
@@ -12,7 +13,9 @@ const useStyles = makeStyles({
   },
 });
 
-export const Overflow: React.FC = (props) => {
+export const Overflow: React.FC<{ overflowDirection?: OverflowDirection }> = (
+  props
+) => {
   const styles = useStyles();
   const [hasOverflow, setHasOverflow] = React.useState(false);
   const [itemVisiblity, setItemVisibility] = React.useState<
@@ -28,7 +31,7 @@ export const Overflow: React.FC = (props) => {
 
         return newState;
       });
-    });
+    }, props.overflowDirection);
 
   return (
     <OverflowContext.Provider

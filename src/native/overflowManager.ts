@@ -1,5 +1,6 @@
 import { PriorityQueue } from "./priorityQueue";
 
+export type OverflowDirection = "start" | "end";
 export interface OverflowItemEntry {
   /**
    * HTML element that will be disappear when overflowed
@@ -7,6 +8,7 @@ export interface OverflowItemEntry {
   element: HTMLElement;
   /**
    * Lower priority items are invisible first when the container is overflowed
+   * @default 0
    */
   priority: number;
   /**
@@ -34,6 +36,19 @@ const EVENT_NAME = "overflow";
 
 export class OverflowManager {
   /**
+   * Contains all overflow items
+   */
+  public container?: HTMLElement;
+  /**
+   * Invisible element used to detect overflow
+   */
+  public sentinel?: HTMLElement;
+  /**
+   * Direction where items are removed when overflow occurs
+   */
+  public overflowDirection: OverflowDirection;
+
+  /**
    * Priority queue of visible items to overflow
    */
   private visibleItemQueue: PriorityQueue<string>;
@@ -45,14 +60,6 @@ export class OverflowManager {
    * Collection of all managed overflow items
    */
   private overflowItems: Record<string, OverflowItemEntry> = {};
-  /**
-   * Contains all overflow items
-   */
-  private container?: HTMLElement;
-  /**
-   * Invisible element used to detect overflow
-   */
-  private sentinel?: HTMLElement;
   /**
    * Used to subscribe to item visibility updates
    */
@@ -70,11 +77,12 @@ export class OverflowManager {
    */
   private mutationObserver: MutationObserver;
 
-  constructor() {
+  constructor(overflowDirection: OverflowDirection = "end") {
     this.visibleItemQueue = this.initVisibleItemQueue();
     this.invisibleItemQueue = this.initInvisibleItemQueue();
     this.resizeObserver = this.initResizeObserver();
     this.mutationObserver = this.initMutationObserver();
+    this.overflowDirection = overflowDirection;
   }
 
   /**
@@ -138,20 +146,6 @@ export class OverflowManager {
    */
   public removeEventListener(func: OverflowEventHandler) {
     this.eventTarget.removeEventListener(EVENT_NAME, func as EventListener);
-  }
-
-  /**
-   * @param container - contains overflow elements
-   */
-  public setContainer(container: HTMLElement) {
-    this.container = container;
-  }
-
-  /**
-   * @param sentinel - Used to subscribe to item visibility updates
-   */
-  public setSentinel(sentinel: HTMLElement) {
-    this.sentinel = sentinel;
   }
 
   private initMutationObserver() {
@@ -238,10 +232,14 @@ export class OverflowManager {
         return priority;
       }
 
-      // equal priority, earlier in DOM should be first
+      const positionComparer =
+        this.overflowDirection === "end"
+          ? Node.DOCUMENT_POSITION_FOLLOWING
+          : Node.DOCUMENT_POSITION_PRECEDING;
+
+      // equal priority, use DOM order
       if (
-        itemA.element.compareDocumentPosition(itemB.element) &
-        Node.DOCUMENT_POSITION_FOLLOWING
+        itemA.element.compareDocumentPosition(itemB.element) & positionComparer
       ) {
         return -1;
       } else {
@@ -260,10 +258,14 @@ export class OverflowManager {
         return priority;
       }
 
-      // equal priority, later in DOM should be first
+      const positionComparer =
+        this.overflowDirection === "end"
+          ? Node.DOCUMENT_POSITION_PRECEDING
+          : Node.DOCUMENT_POSITION_FOLLOWING;
+
+      // equal priority, use DOM order
       if (
-        itemA.element.compareDocumentPosition(itemB.element) &
-        Node.DOCUMENT_POSITION_PRECEDING
+        itemA.element.compareDocumentPosition(itemB.element) & positionComparer
       ) {
         return -1;
       } else {

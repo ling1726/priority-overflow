@@ -1,6 +1,7 @@
 import { useFluent } from "@fluentui/react-components";
 import React from "react";
 import {
+  OverflowDirection,
   OverflowEventHandler,
   OverflowItemEntry,
   OverflowManager,
@@ -15,7 +16,10 @@ export type OnUpdateOverflow = (
   invisibleItems: OverflowItemEntry[]
 ) => void;
 
-export const useOverflowContainer = (update: OnUpdateOverflow) => {
+export const useOverflowContainer = (
+  update: OnUpdateOverflow,
+  overflowDirection?: OverflowDirection
+) => {
   const { targetDocument } = useFluent();
   // DOM ref to the overflow container element
   const containerRef = React.useRef<HTMLDivElement>(null);
@@ -37,8 +41,9 @@ export const useOverflowContainer = (update: OnUpdateOverflow) => {
     }
 
     const overflowManager = overflowManagerRef.current;
-    overflowManager.setContainer(containerRef.current);
-    overflowManager.setSentinel(sentinelRef.current);
+    overflowManager.overflowDirection = overflowDirection ?? "end";
+    overflowManager.container = containerRef.current;
+    overflowManager.sentinel = sentinelRef.current;
     const listener: OverflowEventHandler = (e) => {
       updateOverflowItems(e.detail.visibleItems, e.detail.invisibleItems);
     };
@@ -50,7 +55,7 @@ export const useOverflowContainer = (update: OnUpdateOverflow) => {
       overflowManager.stop();
       overflowManager.removeEventListener(listener);
     };
-  }, [updateOverflowItems, targetDocument]);
+  }, [updateOverflowItems, targetDocument, overflowDirection]);
 
   // Resize the contianer by 1px temporarily to trigger resize observer on initial render
   React.useLayoutEffect(() => {
