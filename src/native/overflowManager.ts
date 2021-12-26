@@ -96,7 +96,7 @@ export class OverflowManager {
     }
 
     if (this.sentinel) {
-      // TODO debate whether we should opt for intersection observer or manual user updates
+      // TODO debate whether we should opt for intersection observer or manual `jiggle` calls
       // this.intersectionObserver.observe(this.sentinel);
     }
   }
