@@ -91,7 +91,7 @@ export const useOverflowContainer = (
 
   const updateOverflow = React.useCallback(() => {
     if (overflowManagerRef.current) {
-      overflowManagerRef.current.jiggle();
+      overflowManagerRef.current.updateOverflow();
     }
   }, []);
 

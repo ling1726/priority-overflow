@@ -45,6 +45,7 @@ export class OverflowManager {
    */
   // TODO debate whether we should opt for intersection observer or manual `jiggle` calls
   // public sentinel?: HTMLElement;
+
   /**
    * Direction where items are removed when overflow occurs
    */
@@ -53,7 +54,7 @@ export class OverflowManager {
   /**
    * Padding at the end of the container before overflow occurs
    */
-  public padding: number = 10;
+  public padding: number = 30;
 
   /**
    * Priority queue of visible items to overflow
@@ -72,23 +73,20 @@ export class OverflowManager {
    */
   private eventTarget: EventTarget = new EventTarget();
   /**
-   * Async timeout to resize the container
-   */
-  private resizeTimeout: number = 0;
-  /**
    * Watches for changes to container size
    */
   private resizeObserver: ResizeObserver;
   /**
    * Watches for when the sentinel is no longer visible
    */
-  private intersectionObserver: IntersectionObserver;
+  // private intersectionObserver: IntersectionObserver;
 
   constructor(overflowDirection: OverflowDirection = "end") {
     this.visibleItemQueue = this.initVisibleItemQueue();
     this.invisibleItemQueue = this.initInvisibleItemQueue();
     this.resizeObserver = this.initResizeObserver();
-    this.intersectionObserver = this.initIntersectionObserver();
+    // TODO debate whether we should opt for intersection observer or manual `jiggle` calls
+    // this.intersectionObserver = this.initIntersectionObserver();
     this.overflowDirection = overflowDirection;
   }
 
@@ -112,8 +110,8 @@ export class OverflowManager {
    */
   public stop() {
     this.resizeObserver.disconnect();
-    this.intersectionObserver.disconnect();
-    clearTimeout(this.resizeTimeout);
+    // TODO debate whether we should opt for intersection observer or manual `jiggle` calls
+    // this.intersectionObserver.disconnect();
   }
 
   /**
@@ -155,39 +153,28 @@ export class OverflowManager {
   }
 
   /**
-   * 'Jiggles' the container width so that the resize observer is triggered.
+   * Manually runs the overflow calculation.
    * Useful when new elements are inserted into the container after the overflow update
    * i.e. extra dividers or menus
    */
-  public jiggle() {
+  public updateOverflow() {
     if (!this.container) {
       return;
     }
-    clearTimeout(this.resizeTimeout);
-    const origWidth = this.container.getBoundingClientRect().width;
-
-    this.container.style.width = `${origWidth - 1}px`;
-    this.resizeTimeout = setTimeout(() => {
-      this.container!.style.width = "";
-    }, 50);
+    this.processOverflowItems(this.container.offsetWidth - this.padding);
   }
 
   private initIntersectionObserver() {
     // Adding removing children DOM nodes can affect overflow (i.e. sudden overflow menu button appearing)
     // When this happens just 'jiggle' the width of the container to trigger the resize observer
     return new IntersectionObserver(
-      () => {
-        if (!this.container) {
+      (entries) => {
+        if (!this.container || !entries[0]) {
           return;
         }
+        const availableWidth = this.container.offsetWidth - this.padding;
 
-        clearTimeout(this.resizeTimeout);
-        const origWidth = this.container.getBoundingClientRect().width;
-
-        this.container.style.width = `${origWidth - 1}px`;
-        this.resizeTimeout = setTimeout(() => {
-          this.container!.style.width = "";
-        }, 100);
+        this.processOverflowItems(availableWidth);
       },
       { root: this.container, threshold: 1 }
     );
@@ -199,53 +186,56 @@ export class OverflowManager {
         return;
       }
 
-      const contentBox = entries[0].contentBoxSize[0];
-      const availableWidth = contentBox.inlineSize - 60;
-
-      // Snapshot of the visible/invisible state to compare for updates
-      const visibleTop = this.visibleItemQueue.peek();
-      const invisibleTop = this.invisibleItemQueue.peek();
-
-      const children = this.container.children;
-      let currentWidth = 0;
-      for (let i = 0; i < children.length; i++) {
-        const child = children[i] as HTMLElement;
-        if (!isNaN(child.offsetWidth)) {
-          currentWidth += child.offsetWidth;
-        }
-      }
-
-      // Add items until available width is filled
-      while (
-        currentWidth < availableWidth &&
-        this.invisibleItemQueue.size > 0
-      ) {
-        const nextvisible = this.invisibleItemQueue.dequeue();
-        this.visibleItemQueue.enqueue(nextvisible);
-
-        const nextVisibleElement = this.overflowItems[nextvisible].element;
-        nextVisibleElement.style.display = "";
-        currentWidth += nextVisibleElement.offsetWidth;
-      }
-
-      // Remove items until there's no more overlap
-      while (currentWidth > availableWidth && this.visibleItemQueue.size > 0) {
-        const nextInvisible = this.visibleItemQueue.dequeue();
-        this.invisibleItemQueue.enqueue(nextInvisible);
-        const nextInvisibleElement = this.overflowItems[nextInvisible].element;
-
-        currentWidth -= nextInvisibleElement.offsetWidth;
-        this.overflowItems[nextInvisible].element.style.display = "none";
-      }
-
-      // only update when the state of visible/invisible items has changed
-      if (
-        this.visibleItemQueue.peek() !== visibleTop ||
-        this.invisibleItemQueue.peek() !== invisibleTop
-      ) {
-        this.dispatchOverflowUpdate();
-      }
+      const availableWidth =
+        entries[0].contentBoxSize[0].inlineSize - this.padding;
+      this.processOverflowItems(availableWidth);
     });
+  }
+
+  private processOverflowItems(availableWidth: number) {
+    if (!this.container) {
+      return;
+    }
+    // Snapshot of the visible/invisible state to compare for updates
+    const visibleTop = this.visibleItemQueue.peek();
+    const invisibleTop = this.invisibleItemQueue.peek();
+
+    const children = this.container.children;
+    let currentWidth = 0;
+    for (let i = 0; i < children.length; i++) {
+      const child = children[i] as HTMLElement;
+      if (!isNaN(child.offsetWidth)) {
+        currentWidth += child.offsetWidth;
+      }
+    }
+
+    // Add items until available width is filled
+    while (currentWidth < availableWidth && this.invisibleItemQueue.size > 0) {
+      const nextvisible = this.invisibleItemQueue.dequeue();
+      this.visibleItemQueue.enqueue(nextvisible);
+
+      const nextVisibleElement = this.overflowItems[nextvisible].element;
+      nextVisibleElement.style.display = "";
+      currentWidth += nextVisibleElement.offsetWidth;
+    }
+
+    // Remove items until there's no more overlap
+    while (currentWidth > availableWidth && this.visibleItemQueue.size > 0) {
+      const nextInvisible = this.visibleItemQueue.dequeue();
+      this.invisibleItemQueue.enqueue(nextInvisible);
+      const nextInvisibleElement = this.overflowItems[nextInvisible].element;
+
+      currentWidth -= nextInvisibleElement.offsetWidth;
+      this.overflowItems[nextInvisible].element.style.display = "none";
+    }
+
+    // only update when the state of visible/invisible items has changed
+    if (
+      this.visibleItemQueue.peek() !== visibleTop ||
+      this.invisibleItemQueue.peek() !== invisibleTop
+    ) {
+      this.dispatchOverflowUpdate();
+    }
   }
 
   private dispatchOverflowUpdate() {

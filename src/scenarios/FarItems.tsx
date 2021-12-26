@@ -21,6 +21,7 @@ const useStyles = makeStyles({
   farItems: {
     dislay: "flex",
     gap: "4px",
+    flexWrap: "nowrap",
   },
 });
 
