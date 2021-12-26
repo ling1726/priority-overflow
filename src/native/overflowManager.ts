@@ -193,7 +193,6 @@ export class OverflowManager {
         return;
       }
 
-      console.log("xx");
       const contentBox = entries[0].contentBoxSize[0];
       const availableWidth = contentBox.inlineSize;
 
