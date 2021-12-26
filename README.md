@@ -1,46 +1,58 @@
-# Getting Started with Create React App
+# Priority overflow implementation
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+## Usage
 
-## Available Scripts
+- npm install
+- npm start
 
-In the project directory, you can run:
+The app will allow you to try out the different scenarios that this tool supports.
 
-### `npm start`
+## Supported use cases
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
+### DOM Order overflow
 
-The page will reload if you make edits.\
-You will also see any lint errors in the console.
+Simply hides items that no longer fit outside the right (left for rtl) boundary of the viewport.
 
-### `npm test`
+### Reverse DOM Order overflow
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+Can overflow from the beginning of the container instead of the end.
 
-### `npm run build`
+### RTL support
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Overflow will work in the same way for RTL and LTR.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+### Custom overflow order
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+Allows setting priorities to each overflow item, so that when overflow occurs, the items with the least priority are hidden first
 
-### `npm run eject`
+### Subscribe for updates
 
-**Note: this is a one-way operation. Once you `eject`, you can’t go back!**
+It's possible to subscribe to updates in item visibility which can be used to implement additional UI around overflow.
 
-If you aren’t satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+## Not in scope
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you’re on your own.
+### Overflow menus
 
-You don’t have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn’t feel obligated to use this feature. However we understand that this tool wouldn’t be useful if you couldn’t customize it when you are ready for it.
+The tool does not support managing a dropdown menu for overflow items, since requirements can vary for each invidividual use case. However
+it's possible to subscribe to changes in item visibility which can be used to implement additional UI around overflow.
 
-## Learn More
+## How it works
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+### ResizeObserver
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+The overflow management is done using a [ResizeObserver](https://developer.mozilla.org/en-US/docs/Web/API/Resize_Observer_API), which watches
+and reports resizes of a specific container element where this priority overflow pattern needs to be implemented.
+
+### Priority queues
+
+In order to support overflow not only for DOM order, but also for custom order, managed overflow items are stored in priority queues. This results in
+`O(log(n))` time for displaying/hiding each item, where `n` is the number of items. Overflow that is only based on DOM order does not need this extra
+complexity.
+
+### display: none
+
+Overflowed items are manually set with `display: none`. This benefits frameworks like React, which can result in extra rerenders to remove a rendered item.
+
+### Item visibility subscription
+
+It's possible to subscribe to changes in item visibility state. This can let you manage additional pieces of UI such as rendering dividers or overflow dropdown menus.
