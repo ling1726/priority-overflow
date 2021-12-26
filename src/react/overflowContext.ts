@@ -10,12 +10,14 @@ export interface OverflowContextValue {
   hasOverflow: boolean;
   registerItem: (item: OverflowItemEntry) => void;
   deregisterItem: (itemId: string | number) => void;
+  updateOverflow: () => void;
 }
 export const OverflowContext = createContext<OverflowContextValue>({
   itemVisibility: {},
   hasOverflow: false,
   registerItem: () => null,
   deregisterItem: () => null,
+  updateOverflow: () => null,
 });
 
 export const useOverflowContext = <SelectedValue>(

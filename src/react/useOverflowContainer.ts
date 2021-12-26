@@ -86,5 +86,17 @@ export const useOverflowContainer = (
     }
   }, []);
 
-  return { containerRef, sentinelRef, registerItem, deregisterItem };
+  const updateOverflow = React.useCallback(() => {
+    if (overflowManagerRef.current) {
+      overflowManagerRef.current.jiggle();
+    }
+  }, []);
+
+  return {
+    containerRef,
+    sentinelRef,
+    registerItem,
+    deregisterItem,
+    updateOverflow,
+  };
 };

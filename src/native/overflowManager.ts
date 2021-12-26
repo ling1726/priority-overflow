@@ -96,7 +96,8 @@ export class OverflowManager {
     }
 
     if (this.sentinel) {
-      this.intersectionObserver.observe(this.sentinel);
+      // TODO debate whether we should opt for intersection observer or manual user updates
+      // this.intersectionObserver.observe(this.sentinel);
     }
   }
 
@@ -119,14 +120,6 @@ export class OverflowManager {
       this.overflowItems[item.id] = item;
       this.visibleItemQueue.enqueue(item.id);
     });
-  }
-
-  /**
-   * @param itemId
-   * @returns Whether manager contains an item
-   */
-  public hasItem(itemId: string) {
-    return !!this.overflowItems[itemId];
   }
 
   /**
@@ -153,6 +146,24 @@ export class OverflowManager {
    */
   public removeEventListener(func: OverflowEventHandler) {
     this.eventTarget.removeEventListener(EVENT_NAME, func as EventListener);
+  }
+
+  /**
+   * 'Jiggles' the container width so that the resize observer is triggered.
+   * Useful when new elements are inserted into the container after the overflow update
+   * i.e. extra dividers or menus
+   */
+  public jiggle() {
+    if (!this.container) {
+      return;
+    }
+    clearTimeout(this.resizeTimeout);
+    const origWidth = this.container.getBoundingClientRect().width;
+
+    this.container.style.width = `${origWidth - 1}px`;
+    this.resizeTimeout = setTimeout(() => {
+      this.container!.style.width = "";
+    }, 50);
   }
 
   private initIntersectionObserver() {
@@ -182,6 +193,7 @@ export class OverflowManager {
         return;
       }
 
+      console.log("xx");
       const contentBox = entries[0].contentBoxSize[0];
       const availableWidth = contentBox.inlineSize;
 
