@@ -9,7 +9,7 @@ const useStyles = makeStyles({
     display: "flex",
     flexWrap: "nowrap",
     minWidth: 0,
-    overflow: "hidden",
+    // overflow: "hidden",
   },
 });
 
@@ -39,7 +39,8 @@ export const Overflow: React.FC<{
 
   const {
     containerRef,
-    sentinelRef,
+    // TODO debate whether we should opt for intersection observer or manual `jiggle` calls
+    // sentinelRef,
     registerItem,
     deregisterItem,
     updateOverflow,
@@ -60,7 +61,10 @@ export const Overflow: React.FC<{
         className={mergeClasses(styles.container, props.className)}
       >
         {props.children}
-        <div style={{ width: 1 }} ref={sentinelRef} />
+        {/**
+         * TODO debate whether we should opt for intersection observer or manual `jiggle` calls
+         * <div style={{ width: 1 }} ref={sentinelRef} />
+         */}
       </div>
     </OverflowContext.Provider>
   );

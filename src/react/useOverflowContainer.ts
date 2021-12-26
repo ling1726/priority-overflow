@@ -27,8 +27,9 @@ export const useOverflowContainer = (
   const { targetDocument } = useFluent();
   // DOM ref to the overflow container element
   const containerRef = React.useRef<HTMLDivElement>(null);
+  // TODO debate whether we should opt for intersection observer or manual `jiggle` calls
   // DOM ref to a spacer element, used to detect available space at the end of the container
-  const sentinelRef = React.useRef<HTMLDivElement>(null);
+  // const sentinelRef = React.useRef<HTMLDivElement>(null);
   const overflowManagerRef = React.useRef<OverflowManager>(
     new OverflowManager()
   );
@@ -38,7 +39,8 @@ export const useOverflowContainer = (
   React.useLayoutEffect(() => {
     if (
       !containerRef.current ||
-      !sentinelRef.current ||
+      // TODO debate whether we should opt for intersection observer or manual `jiggle` calls
+      // !sentinelRef.current ||
       !targetDocument?.defaultView
     ) {
       return;
@@ -47,7 +49,8 @@ export const useOverflowContainer = (
     const overflowManager = overflowManagerRef.current;
     overflowManager.overflowDirection = overflowDirection ?? "end";
     overflowManager.container = containerRef.current;
-    overflowManager.sentinel = sentinelRef.current;
+    // TODO debate whether we should opt for intersection observer or manual `jiggle` calls
+    // overflowManager.sentinel = sentinelRef.current;
     const listener: OverflowEventHandler = (e) => {
       updateOverflowItems({
         visibleItems: e.detail.visibleItems,
@@ -94,7 +97,8 @@ export const useOverflowContainer = (
 
   return {
     containerRef,
-    sentinelRef,
+    // TODO debate whether we should opt for intersection observer or manual `jiggle` calls
+    // sentinelRef,
     registerItem,
     deregisterItem,
     updateOverflow,

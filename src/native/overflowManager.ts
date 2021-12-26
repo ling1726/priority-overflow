@@ -41,13 +41,19 @@ export class OverflowManager {
    */
   public container?: HTMLElement;
   /**
-   * Invisible element used to detect overflow
+   * Invisible element used to detect overflo
    */
-  public sentinel?: HTMLElement;
+  // TODO debate whether we should opt for intersection observer or manual `jiggle` calls
+  // public sentinel?: HTMLElement;
   /**
    * Direction where items are removed when overflow occurs
    */
   public overflowDirection: OverflowDirection;
+
+  /**
+   * Padding at the end of the container before overflow occurs
+   */
+  public padding: number = 10;
 
   /**
    * Priority queue of visible items to overflow
@@ -95,10 +101,10 @@ export class OverflowManager {
       this.resizeObserver.observe(this.container);
     }
 
-    if (this.sentinel) {
-      // TODO debate whether we should opt for intersection observer or manual `jiggle` calls
-      // this.intersectionObserver.observe(this.sentinel);
-    }
+    // TODO debate whether we should opt for intersection observer or manual `jiggle` calls
+    // if (this.sentinel) {
+    //   this.intersectionObserver.observe(this.sentinel);
+    // }
   }
 
   /**
@@ -189,36 +195,46 @@ export class OverflowManager {
 
   private initResizeObserver() {
     return new ResizeObserver((entries) => {
-      if (!entries[0] || !this.sentinel) {
+      if (!entries[0] || !this.container) {
         return;
       }
 
       const contentBox = entries[0].contentBoxSize[0];
-      const availableWidth = contentBox.inlineSize;
+      const availableWidth = contentBox.inlineSize - 60;
 
       // Snapshot of the visible/invisible state to compare for updates
       const visibleTop = this.visibleItemQueue.peek();
       const invisibleTop = this.invisibleItemQueue.peek();
 
+      const children = this.container.children;
+      let currentWidth = 0;
+      for (let i = 0; i < children.length; i++) {
+        const child = children[i] as HTMLElement;
+        if (!isNaN(child.offsetWidth)) {
+          currentWidth += child.offsetWidth;
+        }
+      }
+
       // Add items until available width is filled
       while (
-        this.sentinel.getBoundingClientRect().left < availableWidth &&
+        currentWidth < availableWidth &&
         this.invisibleItemQueue.size > 0
       ) {
         const nextvisible = this.invisibleItemQueue.dequeue();
         this.visibleItemQueue.enqueue(nextvisible);
 
-        this.overflowItems[nextvisible].element.style.display = "";
+        const nextVisibleElement = this.overflowItems[nextvisible].element;
+        nextVisibleElement.style.display = "";
+        currentWidth += nextVisibleElement.offsetWidth;
       }
 
       // Remove items until there's no more overlap
-      while (
-        this.sentinel.getBoundingClientRect().left > availableWidth &&
-        this.visibleItemQueue.size > 0
-      ) {
+      while (currentWidth > availableWidth && this.visibleItemQueue.size > 0) {
         const nextInvisible = this.visibleItemQueue.dequeue();
         this.invisibleItemQueue.enqueue(nextInvisible);
+        const nextInvisibleElement = this.overflowItems[nextInvisible].element;
 
+        currentWidth -= nextInvisibleElement.offsetWidth;
         this.overflowItems[nextInvisible].element.style.display = "none";
       }
 

@@ -8,6 +8,8 @@ import {
   MenuPopover,
   MenuTrigger,
   MenuProps,
+  FluentProvider,
+  teamsLightTheme,
 } from "@fluentui/react-components";
 import DomOrder from "./scenarios/DomOrderOverflow";
 import Priority from "./scenarios/PriorityOverflow";
@@ -25,7 +27,10 @@ const useStyles = makeStyles({
     minWidth: "200px",
   },
 
-  menuButton: {
+  config: {
+    display: "flex",
+    gap: "10px",
+    alignItems: "center",
     marginBottom: "50px",
   },
 });
@@ -44,50 +49,63 @@ function App() {
   const onCheckedChange: MenuProps["onCheckedValueChange"] = (e, data) => {
     setScenarios(data.checkedItems as Scenarios[]);
   };
+  const [rtl, setRtl] = React.useState(false);
 
   return (
-    <div className={styles.container}>
-      <Menu
-        onCheckedValueChange={onCheckedChange}
-        defaultCheckedValues={{ scenario: scenarios }}
-      >
-        <MenuTrigger>
-          <MenuButton className={styles.menuButton}>
-            Hide/display scenarios
-          </MenuButton>
-        </MenuTrigger>
+    <FluentProvider dir={rtl ? "rtl" : "ltr"} theme={teamsLightTheme}>
+      <div className={styles.container}>
+        <div className={styles.config}>
+          <Menu
+            onCheckedValueChange={onCheckedChange}
+            defaultCheckedValues={{ scenario: scenarios }}
+          >
+            <MenuTrigger>
+              <MenuButton>Hide/display scenarios</MenuButton>
+            </MenuTrigger>
 
-        <MenuPopover>
-          <MenuList className={styles.menu}>
-            <MenuItemCheckbox name="scenario" value="dom">
-              Dom order
-            </MenuItemCheckbox>
-            <MenuItemCheckbox name="scenario" value="reverse">
-              Reverse dom order
-            </MenuItemCheckbox>
-            <MenuItemCheckbox name="scenario" value="priority">
-              Manual priority
-            </MenuItemCheckbox>
-            <MenuItemCheckbox name="scenario" value="memoized">
-              Memoized
-            </MenuItemCheckbox>
-            <MenuItemCheckbox name="scenario" value="divider">
-              With dividers
-            </MenuItemCheckbox>
-            <MenuItemCheckbox name="scenario" value="farItems">
-              FarItems
-            </MenuItemCheckbox>
-          </MenuList>
-        </MenuPopover>
-      </Menu>
+            <MenuPopover>
+              <MenuList className={styles.menu}>
+                <MenuItemCheckbox name="scenario" value="dom">
+                  Dom order
+                </MenuItemCheckbox>
+                <MenuItemCheckbox name="scenario" value="reverse">
+                  Reverse dom order
+                </MenuItemCheckbox>
+                <MenuItemCheckbox name="scenario" value="priority">
+                  Manual priority
+                </MenuItemCheckbox>
+                <MenuItemCheckbox name="scenario" value="memoized">
+                  Memoized
+                </MenuItemCheckbox>
+                <MenuItemCheckbox name="scenario" value="divider">
+                  With dividers
+                </MenuItemCheckbox>
+                <MenuItemCheckbox name="scenario" value="farItems">
+                  FarItems
+                </MenuItemCheckbox>
+              </MenuList>
+            </MenuPopover>
+          </Menu>
+          <div>
+            <label htmlFor="rtl">RTL ?</label>
+            <input
+              id="rtl"
+              onChange={(e) => setRtl(e.target.checked)}
+              type="checkbox"
+              name="rtl"
+              checked={rtl}
+            />
+          </div>
+        </div>
 
-      {scenarios.includes("dom") && <DomOrder />}
-      {scenarios.includes("reverse") && <ReverseDomOrder />}
-      {scenarios.includes("priority") && <Priority />}
-      {scenarios.includes("memoized") && <Memoized />}
-      {scenarios.includes("divider") && <Divider />}
-      {scenarios.includes("farItems") && <FarItems />}
-    </div>
+        {scenarios.includes("dom") && <DomOrder />}
+        {scenarios.includes("reverse") && <ReverseDomOrder />}
+        {scenarios.includes("priority") && <Priority />}
+        {scenarios.includes("memoized") && <Memoized />}
+        {scenarios.includes("divider") && <Divider />}
+        {scenarios.includes("farItems") && <FarItems />}
+      </div>
+    </FluentProvider>
   );
 }
 
