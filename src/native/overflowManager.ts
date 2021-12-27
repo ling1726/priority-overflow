@@ -161,8 +161,8 @@ export class OverflowManager {
     const children = this.container.children;
     let currentWidth = 0;
     for (let i = 0; i < children.length; i++) {
-      const child = children[i] as HTMLElement;
-      if (!isNaN(child.offsetWidth)) {
+      const child = children[i];
+      if (child instanceof HTMLElement) {
         currentWidth += child.offsetWidth;
       }
     }
@@ -177,7 +177,6 @@ export class OverflowManager {
       currentWidth += nextVisibleElement.offsetWidth;
     }
 
-    console.log(availableWidth, currentWidth);
     // Remove items until there's no more overlap
     while (currentWidth > availableWidth && this.visibleItemQueue.size > 0) {
       const nextInvisible = this.visibleItemQueue.dequeue();
