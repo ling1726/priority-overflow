@@ -91,7 +91,7 @@ export class OverflowManager {
   /**
    * Start observing container size and child elements and manages overflow item visiblity
    */
-  public observe(container: HTMLElement, options: ObserveOptions) {
+  public observe(container: HTMLElement, options: ObserveOptions = {}) {
     const { padding = 30, overflowDirection = "end" } = options;
     this.container = container;
     this.padding = padding;
