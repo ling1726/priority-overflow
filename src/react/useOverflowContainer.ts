@@ -1,8 +1,7 @@
-import { useFluent } from "@fluentui/react-components";
 import React from "react";
 import {
+  OnUpdateOverflow,
   OverflowDirection,
-  OverflowEventHandler,
   OverflowItemEntry,
   OverflowManager,
 } from "../native/overflowManager";
@@ -18,64 +17,31 @@ export interface OnUpdateOverflowData {
   endItem?: OverflowItemEntry;
 }
 
-export type OnUpdateOverflow = (data: OnUpdateOverflowData) => void;
-
 export const useOverflowContainer = (
   update: OnUpdateOverflow,
   overflowDirection?: OverflowDirection
 ) => {
-  const { targetDocument } = useFluent();
   // DOM ref to the overflow container element
   const containerRef = React.useRef<HTMLDivElement>(null);
-  // TODO debate whether we should opt for intersection observer or manual `jiggle` calls
-  // DOM ref to a spacer element, used to detect available space at the end of the container
-  // const sentinelRef = React.useRef<HTMLDivElement>(null);
+  const updateOverflowItems = useEventCallback(update);
   const overflowManagerRef = React.useRef<OverflowManager>(
-    new OverflowManager()
+    new OverflowManager(updateOverflowItems)
   );
 
-  const updateOverflowItems = useEventCallback(update);
-
   React.useLayoutEffect(() => {
-    if (
-      !containerRef.current ||
-      // TODO debate whether we should opt for intersection observer or manual `jiggle` calls
-      // !sentinelRef.current ||
-      !targetDocument?.defaultView
-    ) {
+    if (!containerRef.current) {
       return;
     }
 
     const overflowManager = overflowManagerRef.current;
-    overflowManager.overflowDirection = overflowDirection ?? "end";
-    overflowManager.container = containerRef.current;
-    // TODO debate whether we should opt for intersection observer or manual `jiggle` calls
-    // overflowManager.sentinel = sentinelRef.current;
-    const listener: OverflowEventHandler = (e) => {
-      updateOverflowItems({
-        visibleItems: e.detail.visibleItems,
-        invisibleItems: e.detail.invisibleItems,
-      });
-    };
-    overflowManager.addEventListener(listener);
-
-    overflowManager.start();
+    overflowManager.observe(containerRef.current, {
+      overflowDirection,
+    });
 
     return () => {
-      overflowManager.stop();
-      overflowManager.removeEventListener(listener);
+      overflowManager.disconnect();
     };
-  }, [updateOverflowItems, targetDocument, overflowDirection]);
-
-  // Resize the contianer by 1px temporarily to trigger resize observer on initial render
-  React.useLayoutEffect(() => {
-    if (containerRef.current) {
-      const origWidth = containerRef.current.getBoundingClientRect().width;
-
-      containerRef.current.style.width = `${origWidth + 1}px`;
-      setTimeout(() => (containerRef.current!.style.width = ""));
-    }
-  }, []);
+  }, [updateOverflowItems, overflowDirection]);
 
   const registerItem = React.useCallback((item: OverflowItemEntry) => {
     if (overflowManagerRef.current) {
@@ -97,8 +63,6 @@ export const useOverflowContainer = (
 
   return {
     containerRef,
-    // TODO debate whether we should opt for intersection observer or manual `jiggle` calls
-    // sentinelRef,
     registerItem,
     deregisterItem,
     updateOverflow,

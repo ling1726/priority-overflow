@@ -1,8 +1,8 @@
 import React from "react";
 import { makeStyles, mergeClasses } from "@fluentui/react-components";
-import { OnUpdateOverflow, useOverflowContainer } from "./useOverflowContainer";
+import { useOverflowContainer } from "./useOverflowContainer";
 import { OverflowContext } from "./overflowContext";
-import { OverflowDirection } from "../native/overflowManager";
+import { OnUpdateOverflow, OverflowDirection } from "../native/overflowManager";
 
 const useStyles = makeStyles({
   container: {
@@ -37,14 +37,8 @@ export const Overflow: React.FC<{
     });
   };
 
-  const {
-    containerRef,
-    // TODO debate whether we should opt for intersection observer or manual `jiggle` calls
-    // sentinelRef,
-    registerItem,
-    deregisterItem,
-    updateOverflow,
-  } = useOverflowContainer(updateItemVisibility, props.overflowDirection);
+  const { containerRef, registerItem, deregisterItem, updateOverflow } =
+    useOverflowContainer(updateItemVisibility, props.overflowDirection);
 
   return (
     <OverflowContext.Provider
@@ -61,10 +55,6 @@ export const Overflow: React.FC<{
         className={mergeClasses(styles.container, props.className)}
       >
         {props.children}
-        {/**
-         * TODO debate whether we should opt for intersection observer or manual `jiggle` calls
-         * <div style={{ width: 1 }} ref={sentinelRef} />
-         */}
       </div>
     </OverflowContext.Provider>
   );

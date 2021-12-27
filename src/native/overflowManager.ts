@@ -21,9 +21,7 @@ export interface OverflowItemEntry {
 /**
  * signature similar to standard event listeners, but typed to handle the custom event
  */
-export type OverflowEventHandler = (
-  e: CustomEvent<OverflowEventPayload>
-) => void;
+export type OnUpdateOverflow = (data: OverflowEventPayload) => void;
 
 /**
  * Payload of the custom DOM event for overflow updates
@@ -33,29 +31,31 @@ export interface OverflowEventPayload {
   invisibleItems: OverflowItemEntry[];
 }
 
-const EVENT_NAME = "overflow";
+export interface ObserveOptions {
+  /**
+   * Padding at the end of the container before overflow occurs
+   * @default 30
+   */
+  padding?: number;
+  /**
+   * Direction where items are removed when overflow occurs
+   * @default end
+   */
+  overflowDirection?: OverflowDirection;
+}
 
 export class OverflowManager {
   /**
+   * Called each time the item visibility is updated due to overflow
+   */
+  private onUpdateOverflow?: (data: OverflowEventPayload) => void;
+  /**
    * Contains all overflow items
    */
-  public container?: HTMLElement;
-  /**
-   * Invisible element used to detect overflo
-   */
-  // TODO debate whether we should opt for intersection observer or manual `jiggle` calls
-  // public sentinel?: HTMLElement;
-
-  /**
-   * Direction where items are removed when overflow occurs
-   */
-  public overflowDirection: OverflowDirection;
-
-  /**
-   * Padding at the end of the container before overflow occurs
-   */
-  public padding: number = 30;
-
+  private container?: HTMLElement;
+  private overflowDirection: NonNullable<ObserveOptions["overflowDirection"]> =
+    "end";
+  private padding: NonNullable<ObserveOptions["padding"]> = 30;
   /**
    * Priority queue of visible items to overflow
    */
@@ -81,37 +81,31 @@ export class OverflowManager {
    */
   // private intersectionObserver: IntersectionObserver;
 
-  constructor(overflowDirection: OverflowDirection = "end") {
+  constructor(update: OnUpdateOverflow) {
     this.visibleItemQueue = this.initVisibleItemQueue();
     this.invisibleItemQueue = this.initInvisibleItemQueue();
     this.resizeObserver = this.initResizeObserver();
-    // TODO debate whether we should opt for intersection observer or manual `jiggle` calls
-    // this.intersectionObserver = this.initIntersectionObserver();
-    this.overflowDirection = overflowDirection;
+    this.onUpdateOverflow = update;
   }
 
   /**
    * Start observing container size and child elements and manages overflow item visiblity
    */
-  public start() {
-    if (this.container) {
-      this.dispatchOverflowUpdate();
-      this.resizeObserver.observe(this.container);
-    }
+  public observe(container: HTMLElement, options: ObserveOptions) {
+    const { padding = 30, overflowDirection = "end" } = options;
+    this.container = container;
+    this.padding = padding;
+    this.overflowDirection = overflowDirection;
 
-    // TODO debate whether we should opt for intersection observer or manual `jiggle` calls
-    // if (this.sentinel) {
-    //   this.intersectionObserver.observe(this.sentinel);
-    // }
+    this.dispatchOverflowUpdate();
+    this.resizeObserver.observe(this.container);
   }
 
   /**
    * Stops observing container size and child elements
    */
-  public stop() {
+  public disconnect() {
     this.resizeObserver.disconnect();
-    // TODO debate whether we should opt for intersection observer or manual `jiggle` calls
-    // this.intersectionObserver.disconnect();
   }
 
   /**
@@ -139,20 +133,6 @@ export class OverflowManager {
   }
 
   /**
-   * @param func - Handles item visibility updates
-   */
-  public addEventListener(func: OverflowEventHandler) {
-    this.eventTarget.addEventListener(EVENT_NAME, func as EventListener);
-  }
-
-  /**
-   * @param func - Reference to the event handler to remove
-   */
-  public removeEventListener(func: OverflowEventHandler) {
-    this.eventTarget.removeEventListener(EVENT_NAME, func as EventListener);
-  }
-
-  /**
    * Manually runs the overflow calculation.
    * Useful when new elements are inserted into the container after the overflow update
    * i.e. extra dividers or menus
@@ -162,22 +142,6 @@ export class OverflowManager {
       return;
     }
     this.processOverflowItems(this.container.offsetWidth - this.padding);
-  }
-
-  private initIntersectionObserver() {
-    // Adding removing children DOM nodes can affect overflow (i.e. sudden overflow menu button appearing)
-    // When this happens just 'jiggle' the width of the container to trigger the resize observer
-    return new IntersectionObserver(
-      (entries) => {
-        if (!this.container || !entries[0]) {
-          return;
-        }
-        const availableWidth = this.container.offsetWidth - this.padding;
-
-        this.processOverflowItems(availableWidth);
-      },
-      { root: this.container, threshold: 1 }
-    );
   }
 
   private initResizeObserver() {
@@ -249,11 +213,7 @@ export class OverflowManager {
       (itemId) => this.overflowItems[itemId]
     );
 
-    this.eventTarget.dispatchEvent(
-      new CustomEvent<OverflowEventPayload>(EVENT_NAME, {
-        detail: { visibleItems, invisibleItems },
-      })
-    );
+    this.onUpdateOverflow?.({ visibleItems, invisibleItems });
   }
 
   private initInvisibleItemQueue() {
