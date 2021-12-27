@@ -33,7 +33,9 @@ export interface OverflowEventPayload {
 
 export interface ObserveOptions {
   /**
-   * Padding at the end of the container before overflow occurs
+   * Padding (in px) at the end of the container before overflow occurs
+   * Useful to account for extra elements (i.e. dropdown menu)
+   * or to account for any kinds of margins between items which are hard to measure with JS
    * @default 30
    */
   padding?: number;
@@ -73,20 +75,20 @@ export class OverflowManager {
    */
   private resizeObserver: ResizeObserver;
 
-  constructor(update: OnUpdateOverflow) {
+  constructor(onUpdateOverflow: OnUpdateOverflow) {
     this.visibleItemQueue = this.initVisibleItemQueue();
     this.invisibleItemQueue = this.initInvisibleItemQueue();
     this.resizeObserver = this.initResizeObserver();
-    this.onUpdateOverflow = update;
+    this.onUpdateOverflow = onUpdateOverflow;
   }
 
   /**
    * Start observing container size and child elements and manages overflow item visiblity
    */
   public observe(container: HTMLElement, options: ObserveOptions = {}) {
-    const { padding = 30, overflowDirection = "end" } = options;
+    const { padding, overflowDirection = "end" } = options;
     this.container = container;
-    this.padding = padding;
+    this.padding = padding ?? this.padding;
     this.overflowDirection = overflowDirection;
 
     this.dispatchOverflowUpdate();
@@ -175,6 +177,7 @@ export class OverflowManager {
       currentWidth += nextVisibleElement.offsetWidth;
     }
 
+    console.log(availableWidth, currentWidth);
     // Remove items until there's no more overlap
     while (currentWidth > availableWidth && this.visibleItemQueue.size > 0) {
       const nextInvisible = this.visibleItemQueue.dequeue();

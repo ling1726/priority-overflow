@@ -12,23 +12,39 @@ import { TestOverflowMenuItem } from "./TestOverflowMenuItem";
 export const OverflowMenu: React.FC<{ itemIds: string[] | number[] }> = ({
   itemIds,
 }) => {
-  const hasOverflow = useOverflowContext((v) => v.hasOverflow);
+  const overflowCount = useOverflowContext((v) => {
+    return Object.values(v.itemVisibility).reduce((acc, cur) => {
+      if (!cur) {
+        acc++;
+      }
+
+      return acc;
+    }, 0);
+  });
   const updateOverflow = useOverflowContext((v) => v.updateOverflow);
 
+  // From what I can see no overflow solution really handles
+  // extra elements (i.e. overflow menu button) unless it is coupled to the expected UI (IMO the coupling is bad)
+  // I don't think manually recalculating is so bad
+  // What commonly happens is to set padding in the container to account for the extra element
+  // Alternatives:
+  // 1. create a `renderOverflowMenu` call back (this is the same as currently tbh)
+  // 2. use a mutation observer to observe smth like data-update-overflow when an element is added
+  // 3. Use the configurable padding so that the menu always fits (reakit solution: https://codesandbox.io/s/ariakit-collapsible-tab-835t8?file=/src/tab-collapsible.tsx)
   React.useEffect(() => {
-    if (hasOverflow) {
+    if (overflowCount > 0) {
       updateOverflow();
     }
-  }, [hasOverflow, updateOverflow]);
+  }, [overflowCount, updateOverflow]);
 
-  if (!hasOverflow) {
+  if (overflowCount === 0) {
     return null;
   }
 
   return (
     <Menu>
       <MenuTrigger>
-        <Button>Overflow menu</Button>
+        <Button>+{overflowCount} items</Button>
       </MenuTrigger>
 
       <MenuPopover>
