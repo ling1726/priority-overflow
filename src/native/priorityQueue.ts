@@ -1,13 +1,16 @@
+export type PriorityQueueCompareFn<T> = (a: T, b: T) => number;
+
 /**
  * Priority queue implemented with a min heap
  */
 export class PriorityQueue<T> {
   public arr: T[] = [];
-  private compare: (a: T, b: T) => number;
+  private compare: PriorityQueueCompareFn<T>;
   public size: number = 0;
 
-  constructor(compare: (a: T, b: T) => number) {
+  constructor(compare: PriorityQueueCompareFn<T>) {
     this.compare = compare;
+    this.arr.sort();
   }
 
   private left(i: number) {
