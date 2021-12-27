@@ -76,10 +76,6 @@ export class OverflowManager {
    * Watches for changes to container size
    */
   private resizeObserver: ResizeObserver;
-  /**
-   * Watches for when the sentinel is no longer visible
-   */
-  // private intersectionObserver: IntersectionObserver;
 
   constructor(update: OnUpdateOverflow) {
     this.visibleItemQueue = this.initVisibleItemQueue();
