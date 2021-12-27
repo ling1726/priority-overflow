@@ -212,6 +212,7 @@ export class OverflowManager {
     return new PriorityQueue<string>((a, b) => {
       const itemA = this.overflowItems[a];
       const itemB = this.overflowItems[b];
+      // Higher priority at the top of the queue
       const priority = itemB.priority - itemA.priority;
       if (priority !== 0) {
         return priority;
@@ -237,6 +238,7 @@ export class OverflowManager {
     return new PriorityQueue<string>((a, b) => {
       const itemA = this.overflowItems[a];
       const itemB = this.overflowItems[b];
+      // Lower priority at the top of the queue
       const priority = itemA.priority - itemB.priority;
 
       if (priority !== 0) {
