@@ -69,10 +69,6 @@ export class OverflowManager {
    */
   private overflowItems: Record<string, OverflowItemEntry> = {};
   /**
-   * Used to subscribe to item visibility updates
-   */
-  private eventTarget: EventTarget = new EventTarget();
-  /**
    * Watches for changes to container size
    */
   private resizeObserver: ResizeObserver;
