@@ -3,6 +3,7 @@ import { PriorityQueue } from "./priorityQueue";
 export type OverflowDirection = "start" | "end";
 /** Indicates that this item can be overflowed */
 export const OVERFLOW_ITEM_DATA = "data-overflow-item";
+export const OVERFLOW_ITEM_INVISIBLE = "data-overflow-invisible";
 /** Indicates that this element is only visible when there is overflow */
 export const OVERFLOW_ONLY_ITEM = "data-overflow-only";
 export interface OverflowItemEntry {
@@ -170,7 +171,10 @@ export class OverflowManager {
     let currentWidth = 0;
     for (let i = 0; i < children.length; i++) {
       const child = children[i];
-      if (child instanceof HTMLElement) {
+      if (
+        child instanceof HTMLElement &&
+        !child.hasAttribute(OVERFLOW_ITEM_INVISIBLE)
+      ) {
         currentWidth += child.offsetWidth;
       }
     }
@@ -219,6 +223,7 @@ export class OverflowManager {
 
     const item = this.overflowItems[nextVisible];
     item.element.style.display = "";
+    item.element.removeAttribute(OVERFLOW_ITEM_INVISIBLE);
     return item.element.offsetWidth;
   }
 
@@ -229,6 +234,7 @@ export class OverflowManager {
     const item = this.overflowItems[nextInvisible];
     const width = item.element.offsetWidth;
     item.element.style.display = "none";
+    item.element.setAttribute(OVERFLOW_ITEM_INVISIBLE, "");
     return width;
   }
 

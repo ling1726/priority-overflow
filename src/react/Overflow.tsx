@@ -32,6 +32,8 @@ export const Overflow: React.FC<{
       const newState: Record<string, boolean> = {};
       visibleItems.forEach((x) => (newState[x.id] = true));
       invisibleItems.forEach((x) => (newState[x.id] = false));
+      console.log("visible", visibleItems);
+      console.log("invisible", invisibleItems);
 
       return newState;
     });
