@@ -13,8 +13,8 @@ export const OverflowMenu: React.FC<{ itemIds: string[] | number[] }> = ({
   itemIds,
 }) => {
   const overflowCount = useOverflowContext((v) => {
-    return Object.values(v.itemVisibility).reduce((acc, cur) => {
-      if (!cur) {
+    return Object.entries(v.itemVisibility).reduce((acc, cur) => {
+      if (!cur[0].startsWith("divider") && !cur[1]) {
         acc++;
       }
 
