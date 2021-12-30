@@ -49,9 +49,12 @@ export const OverflowMenu: React.FC<{ itemIds: string[] | number[] }> = ({
 
       <MenuPopover>
         <MenuList>
-          {itemIds.map((i) => (
-            <TestOverflowMenuItem key={i} id={i} />
-          ))}
+          {itemIds.map((i) => {
+            if (typeof i === "string" && i.startsWith("divider")) {
+              return null;
+            }
+            return <TestOverflowMenuItem key={i} id={i} />;
+          })}
         </MenuList>
       </MenuPopover>
     </Menu>
