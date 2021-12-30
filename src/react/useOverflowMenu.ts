@@ -12,14 +12,13 @@ export function useOverflowMenu<TElement extends HTMLElement>() {
   React.useEffect(() => {
     if (ref.current) {
       ref.current.setAttribute(OVERFLOW_ONLY_ITEM, "");
+      ref.current.style.flexShrink = "0";
     }
   }, [isOverflowing]);
 
   React.useEffect(() => {
     if (isOverflowing) {
-      updateOverflow(ref.current?.offsetWidth);
-    } else {
-      updateOverflow(0);
+      updateOverflow();
     }
   }, [isOverflowing, updateOverflow, ref]);
 

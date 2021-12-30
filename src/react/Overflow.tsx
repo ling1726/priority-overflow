@@ -2,7 +2,11 @@ import React from "react";
 import { makeStyles, mergeClasses } from "@fluentui/react-components";
 import { useOverflowContainer } from "./useOverflowContainer";
 import { OverflowContext } from "./overflowContext";
-import { OnUpdateOverflow, OverflowDirection } from "../native/overflowManager";
+import {
+  OnUpdateOverflow,
+  OverflowAxis,
+  OverflowDirection,
+} from "../native/overflowManager";
 
 const useStyles = makeStyles({
   container: {
@@ -11,12 +15,19 @@ const useStyles = makeStyles({
     minWidth: 0,
     overflow: "hidden",
   },
+
+  vertical: {
+    flexDirection: "column",
+  },
 });
 
-export const Overflow: React.FC<{
+export interface OverflowProps extends React.HTMLAttributes<HTMLDivElement> {
   overflowDirection?: OverflowDirection;
-  className?: string;
-}> = (props) => {
+  overflowAxis?: OverflowAxis;
+}
+
+export const Overflow: React.FC<OverflowProps> = (props) => {
+  const { overflowAxis = "horizontal", overflowDirection, ...rest } = props;
   const styles = useStyles();
   const [hasOverflow, setHasOverflow] = React.useState(false);
   const [itemVisiblity, setItemVisibility] = React.useState<
@@ -32,8 +43,8 @@ export const Overflow: React.FC<{
       const newState: Record<string, boolean> = {};
       visibleItems.forEach((x) => (newState[x.id] = true));
       invisibleItems.forEach((x) => (newState[x.id] = false));
-      console.log("visible", visibleItems);
-      console.log("invisible", invisibleItems);
+      // console.log("visible", visibleItems);
+      // console.log("invisible", invisibleItems);
 
       return newState;
     });
@@ -41,7 +52,10 @@ export const Overflow: React.FC<{
 
   const { containerRef, registerItem, updateOverflow } = useOverflowContainer(
     updateItemVisibility,
-    props.overflowDirection
+    {
+      overflowDirection,
+      overflowAxis,
+    }
   );
 
   return (
@@ -54,8 +68,13 @@ export const Overflow: React.FC<{
       }}
     >
       <div
+        {...rest}
         ref={containerRef}
-        className={mergeClasses(styles.container, props.className)}
+        className={mergeClasses(
+          styles.container,
+          props.className,
+          props.overflowAxis === "vertical" && styles.vertical
+        )}
       >
         {props.children}
       </div>

@@ -1,7 +1,7 @@
 import React from "react";
 import {
+  ObserveOptions,
   OnUpdateOverflow,
-  OverflowDirection,
   OverflowItemEntry,
   OverflowManager,
 } from "../native/overflowManager";
@@ -14,10 +14,13 @@ export interface OnUpdateOverflowData {
   endItem?: OverflowItemEntry;
 }
 
+export interface useOverflowContainerOptions extends ObserveOptions {}
+
 export const useOverflowContainer = (
   update: OnUpdateOverflow,
-  overflowDirection?: OverflowDirection
+  options: useOverflowContainerOptions = {}
 ) => {
+  const { overflowAxis, overflowDirection } = options;
   // DOM ref to the overflow container element
   const containerRef = React.useRef<HTMLDivElement>(null);
   const updateOverflowItems = useEventCallback(update);
@@ -32,12 +35,13 @@ export const useOverflowContainer = (
 
     overflowManager.observe(containerRef.current, {
       overflowDirection,
+      overflowAxis,
     });
 
     return () => {
       overflowManager.disconnect();
     };
-  }, [updateOverflowItems, overflowDirection, overflowManager]);
+  }, [updateOverflowItems, overflowManager, overflowDirection, overflowAxis]);
 
   const registerItem = React.useCallback(
     (item: OverflowItemEntry) => {

@@ -1,6 +1,7 @@
 import { PriorityQueue } from "./priorityQueue";
 
 export type OverflowDirection = "start" | "end";
+export type OverflowAxis = "horizontal" | "vertical";
 /** Indicates that this item can be overflowed */
 export const OVERFLOW_ITEM_DATA = "data-overflow-item";
 export const OVERFLOW_ITEM_INVISIBLE = "data-overflow-invisible";
@@ -48,6 +49,12 @@ export interface ObserveOptions {
    * @default end
    */
   overflowDirection?: OverflowDirection;
+
+  /**
+   * Horizontal or vertical overflow
+   * @default horizontal
+   */
+  overflowAxis?: OverflowAxis;
 }
 
 export class OverflowManager {
@@ -61,6 +68,8 @@ export class OverflowManager {
   private container?: HTMLElement;
   private overflowDirection: NonNullable<ObserveOptions["overflowDirection"]> =
     "end";
+  private overflowAxis: NonNullable<ObserveOptions["overflowAxis"]> =
+    "horizontal";
   private padding: NonNullable<ObserveOptions["padding"]> = 0;
   /**
    * Priority queue of visible items to overflow
@@ -90,10 +99,11 @@ export class OverflowManager {
    * Start observing container size and child elements and manages overflow item visiblity
    */
   public observe(container: HTMLElement, options: ObserveOptions = {}) {
-    const { padding, overflowDirection = "end" } = options;
+    const { padding, overflowAxis, overflowDirection } = options;
     this.container = container;
     this.padding = padding ?? this.padding;
-    this.overflowDirection = overflowDirection;
+    this.overflowDirection = overflowDirection ?? this.overflowDirection;
+    this.overflowAxis = overflowAxis ?? this.overflowAxis;
 
     this.dispatchOverflowUpdate();
     this.resizeObserver.observe(this.container);
@@ -144,7 +154,9 @@ export class OverflowManager {
       this.padding = padding;
     }
 
-    this.processOverflowItems(this.container.offsetWidth - this.padding);
+    this.processOverflowItems(
+      this.getOffsetSize(this.container) - this.padding
+    );
   }
 
   private initResizeObserver() {
@@ -153,16 +165,26 @@ export class OverflowManager {
         return;
       }
 
-      const availableWidth =
-        entries[0].contentBoxSize[0].inlineSize - this.padding;
-      this.processOverflowItems(availableWidth);
+      const dimension =
+        this.overflowAxis === "horizontal" ? "inlineSize" : "blockSize";
+
+      const availableSize =
+        entries[0].contentBoxSize[0][dimension] - this.padding;
+      this.processOverflowItems(availableSize);
     });
   }
 
-  private processOverflowItems(availableWidth: number) {
+  private getOffsetSize(el: HTMLElement) {
+    return this.overflowAxis === "horizontal"
+      ? el.offsetWidth
+      : el.offsetHeight;
+  }
+
+  private processOverflowItems(availableSize: number) {
     if (!this.container) {
       return;
     }
+
     // Snapshot of the visible/invisible state to compare for updates
     const visibleTop = this.visibleItemQueue.peek();
     const invisibleTop = this.invisibleItemQueue.peek();
@@ -175,17 +197,27 @@ export class OverflowManager {
         child instanceof HTMLElement &&
         !child.hasAttribute(OVERFLOW_ITEM_INVISIBLE)
       ) {
-        currentWidth += child.offsetWidth;
+        currentWidth += this.getOffsetSize(child);
+      }
+    }
+
+    const overflowOnlyItems = document.querySelectorAll(
+      `[${OVERFLOW_ONLY_ITEM}]`
+    );
+    for (let i = 0; i < overflowOnlyItems.length; i++) {
+      const overflowOnlyItem = overflowOnlyItems[i];
+      if (overflowOnlyItem instanceof HTMLElement) {
+        currentWidth += this.getOffsetSize(overflowOnlyItem);
       }
     }
 
     // Add items until available width is filled
-    while (currentWidth < availableWidth && this.invisibleItemQueue.size > 0) {
+    while (currentWidth < availableSize && this.invisibleItemQueue.size > 0) {
       currentWidth += this.makeItemVisible();
     }
 
     // Remove items until there's no more overlap
-    while (currentWidth > availableWidth && this.visibleItemQueue.size > 0) {
+    while (currentWidth > availableSize && this.visibleItemQueue.size > 0) {
       currentWidth -= this.makeItemInvisible();
     }
 
@@ -197,13 +229,13 @@ export class OverflowManager {
       for (let i = 0; i < overflowOnlyItems.length; i++) {
         const overflowOnlyItem = overflowOnlyItems[i];
         if (overflowOnlyItem instanceof HTMLElement) {
-          currentWidth -= overflowOnlyItem.offsetWidth;
+          currentWidth -= this.getOffsetSize(overflowOnlyItem);
         }
       }
 
       currentWidth += this.makeItemVisible();
 
-      if (currentWidth > availableWidth) {
+      if (currentWidth > availableSize) {
         this.makeItemInvisible();
       }
     }
@@ -224,7 +256,7 @@ export class OverflowManager {
     const item = this.overflowItems[nextVisible];
     item.element.style.display = "";
     item.element.removeAttribute(OVERFLOW_ITEM_INVISIBLE);
-    return item.element.offsetWidth;
+    return this.getOffsetSize(item.element);
   }
 
   private makeItemInvisible() {
@@ -232,7 +264,7 @@ export class OverflowManager {
     this.invisibleItemQueue.enqueue(nextInvisible);
 
     const item = this.overflowItems[nextInvisible];
-    const width = item.element.offsetWidth;
+    const width = this.getOffsetSize(item.element);
     item.element.style.display = "none";
     item.element.setAttribute(OVERFLOW_ITEM_INVISIBLE, "");
     return width;
