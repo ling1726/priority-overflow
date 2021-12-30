@@ -5,7 +5,8 @@ import { useOverflowItem } from "../react/useOverflowItem";
 const useStyles = makeStyles({
   container: {
     display: "flex",
-    marginRight: "4px",
+    paddingLeft: "2px",
+    paddingRight: "2px",
   },
 });
 
