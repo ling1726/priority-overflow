@@ -8,15 +8,13 @@ import { OverflowItemEntry } from "../native/overflowManager";
 export interface OverflowContextValue {
   itemVisibility: Record<string, boolean>;
   hasOverflow: boolean;
-  registerItem: (item: OverflowItemEntry) => void;
-  deregisterItem: (itemId: string | number) => void;
-  updateOverflow: () => void;
+  registerItem: (item: OverflowItemEntry) => () => void;
+  updateOverflow: (padding?: number) => void;
 }
 export const OverflowContext = createContext<OverflowContextValue>({
   itemVisibility: {},
   hasOverflow: false,
-  registerItem: () => null,
-  deregisterItem: () => null,
+  registerItem: () => () => null,
   updateOverflow: () => null,
 });
 

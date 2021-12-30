@@ -7,9 +7,6 @@ import {
 } from "../native/overflowManager";
 import { useEventCallback } from "../utils/useEventCallback";
 
-export const overflowAttr = "data-overflow-item";
-export const overflowPriorityAttr = "data-overflow-priority";
-
 export interface OnUpdateOverflowData {
   visibleItems: OverflowItemEntry[];
   invisibleItems: OverflowItemEntry[];
@@ -24,8 +21,8 @@ export const useOverflowContainer = (
   // DOM ref to the overflow container element
   const containerRef = React.useRef<HTMLDivElement>(null);
   const updateOverflowItems = useEventCallback(update);
-  const overflowManagerRef = React.useRef<OverflowManager>(
-    new OverflowManager(updateOverflowItems)
+  const [overflowManager] = React.useState<OverflowManager>(
+    () => new OverflowManager(updateOverflowItems)
   );
 
   React.useLayoutEffect(() => {
@@ -33,7 +30,6 @@ export const useOverflowContainer = (
       return;
     }
 
-    const overflowManager = overflowManagerRef.current;
     overflowManager.observe(containerRef.current, {
       overflowDirection,
     });
@@ -41,30 +37,24 @@ export const useOverflowContainer = (
     return () => {
       overflowManager.disconnect();
     };
-  }, [updateOverflowItems, overflowDirection]);
+  }, [updateOverflowItems, overflowDirection, overflowManager]);
 
-  const registerItem = React.useCallback((item: OverflowItemEntry) => {
-    if (overflowManagerRef.current) {
-      overflowManagerRef.current.addItems(item);
-    }
-  }, []);
+  const registerItem = React.useCallback(
+    (item: OverflowItemEntry) => {
+      overflowManager.addItems(item);
 
-  const deregisterItem = React.useCallback((itemId: string | number) => {
-    if (overflowManagerRef.current) {
-      overflowManagerRef.current.removeItem(itemId + "");
-    }
-  }, []);
+      return () => overflowManager.removeItem(item.id);
+    },
+    [overflowManager]
+  );
 
   const updateOverflow = React.useCallback(() => {
-    if (overflowManagerRef.current) {
-      overflowManagerRef.current.updateOverflow();
-    }
-  }, []);
+    overflowManager.updateOverflow();
+  }, [overflowManager]);
 
   return {
     containerRef,
     registerItem,
-    deregisterItem,
     updateOverflow,
   };
 };

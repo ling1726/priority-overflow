@@ -7,11 +7,11 @@ export function useOverflowItem<TElement extends HTMLElement>(
 ) {
   const ref = React.useRef<TElement>(null);
   const registerItem = useOverflowContext((v) => v.registerItem);
-  const deregisterItem = useOverflowContext((v) => v.deregisterItem);
 
   React.useLayoutEffect(() => {
+    let deregisterItem: () => void = () => null;
     if (ref.current) {
-      registerItem({
+      deregisterItem = registerItem({
         element: ref.current,
         id: id + "",
         priority: priority ?? 0,
@@ -19,9 +19,9 @@ export function useOverflowItem<TElement extends HTMLElement>(
     }
 
     return () => {
-      deregisterItem(id);
+      deregisterItem();
     };
-  }, [id, priority, registerItem, deregisterItem]);
+  }, [id, priority, registerItem]);
 
   return ref;
 }

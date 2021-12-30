@@ -37,8 +37,10 @@ export const Overflow: React.FC<{
     });
   };
 
-  const { containerRef, registerItem, deregisterItem, updateOverflow } =
-    useOverflowContainer(updateItemVisibility, props.overflowDirection);
+  const { containerRef, registerItem, updateOverflow } = useOverflowContainer(
+    updateItemVisibility,
+    props.overflowDirection
+  );
 
   return (
     <OverflowContext.Provider
@@ -46,7 +48,6 @@ export const Overflow: React.FC<{
         itemVisibility: itemVisiblity,
         hasOverflow,
         registerItem,
-        deregisterItem,
         updateOverflow,
       }}
     >
