@@ -1,7 +1,10 @@
 import { PriorityQueue } from "./priorityQueue";
 
 export type OverflowDirection = "start" | "end";
+/** Indicates that this item can be overflowed */
 export const OVERFLOW_ITEM_DATA = "data-overflow-item";
+/** Indicates that this element is only visible when there is overflow */
+export const OVERFLOW_ONLY_ITEM = "data-overflow-only";
 export interface OverflowItemEntry {
   /**
    * HTML element that will be disappear when overflowed
@@ -57,7 +60,7 @@ export class OverflowManager {
   private container?: HTMLElement;
   private overflowDirection: NonNullable<ObserveOptions["overflowDirection"]> =
     "end";
-  private padding: NonNullable<ObserveOptions["padding"]> = 30;
+  private padding: NonNullable<ObserveOptions["padding"]> = 0;
   /**
    * Priority queue of visible items to overflow
    */
@@ -131,10 +134,15 @@ export class OverflowManager {
    * Useful when new elements are inserted into the container after the overflow update
    * i.e. extra dividers or menus
    */
-  public updateOverflow() {
+  public updateOverflow(padding?: number) {
     if (!this.container) {
       return;
     }
+
+    if (padding !== undefined) {
+      this.padding = padding;
+    }
+
     this.processOverflowItems(this.container.offsetWidth - this.padding);
   }
 
@@ -158,7 +166,7 @@ export class OverflowManager {
     const visibleTop = this.visibleItemQueue.peek();
     const invisibleTop = this.invisibleItemQueue.peek();
 
-    const children = this.container.children;
+    const children = this.container.querySelectorAll(`[${OVERFLOW_ITEM_DATA}]`);
     let currentWidth = 0;
     for (let i = 0; i < children.length; i++) {
       const child = children[i];
@@ -169,22 +177,31 @@ export class OverflowManager {
 
     // Add items until available width is filled
     while (currentWidth < availableWidth && this.invisibleItemQueue.size > 0) {
-      const nextvisible = this.invisibleItemQueue.dequeue();
-      this.visibleItemQueue.enqueue(nextvisible);
-
-      const nextVisibleElement = this.overflowItems[nextvisible].element;
-      nextVisibleElement.style.display = "";
-      currentWidth += nextVisibleElement.offsetWidth;
+      currentWidth += this.makeItemVisible();
     }
 
     // Remove items until there's no more overlap
     while (currentWidth > availableWidth && this.visibleItemQueue.size > 0) {
-      const nextInvisible = this.visibleItemQueue.dequeue();
-      this.invisibleItemQueue.enqueue(nextInvisible);
-      const nextInvisibleElement = this.overflowItems[nextInvisible].element;
+      currentWidth -= this.makeItemInvisible();
+    }
 
-      currentWidth -= nextInvisibleElement.offsetWidth;
-      this.overflowItems[nextInvisible].element.style.display = "none";
+    // Make sure that any overflow only items (i.e. dropdown menus) can actually be removed
+    if (this.invisibleItemQueue.size === 1) {
+      const overflowOnlyItems = document.querySelectorAll(
+        `[${OVERFLOW_ONLY_ITEM}]`
+      );
+      for (let i = 0; i < overflowOnlyItems.length; i++) {
+        const overflowOnlyItem = overflowOnlyItems[i];
+        if (overflowOnlyItem instanceof HTMLElement) {
+          currentWidth -= overflowOnlyItem.offsetWidth;
+        }
+      }
+
+      currentWidth += this.makeItemVisible();
+
+      if (currentWidth > availableWidth) {
+        this.makeItemInvisible();
+      }
     }
 
     // only update when the state of visible/invisible items has changed
@@ -194,6 +211,25 @@ export class OverflowManager {
     ) {
       this.dispatchOverflowUpdate();
     }
+  }
+
+  private makeItemVisible() {
+    const nextVisible = this.invisibleItemQueue.dequeue();
+    this.visibleItemQueue.enqueue(nextVisible);
+
+    const item = this.overflowItems[nextVisible];
+    item.element.style.display = "";
+    return item.element.offsetWidth;
+  }
+
+  private makeItemInvisible() {
+    const nextInvisible = this.visibleItemQueue.dequeue();
+    this.invisibleItemQueue.enqueue(nextInvisible);
+
+    const item = this.overflowItems[nextInvisible];
+    const width = item.element.offsetWidth;
+    item.element.style.display = "none";
+    return width;
   }
 
   private dispatchOverflowUpdate() {
