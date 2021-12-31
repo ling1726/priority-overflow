@@ -7,6 +7,8 @@ export function useOverflowItem<TElement extends HTMLElement>(
 ) {
   const ref = React.useRef<TElement>(null);
   const registerItem = useOverflowContext((v) => v.registerItem);
+  // TODO should this be another hook or part of this hook
+  // const isVisible = useOverflowContext((v) => v.itemVisibility[id]);
 
   React.useLayoutEffect(() => {
     let deregisterItem: () => void = () => null;

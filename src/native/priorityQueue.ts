@@ -57,6 +57,10 @@ export class PriorityQueue<T> {
   }
 
   public dequeue(): T {
+    if (this.size === 0) {
+      throw new Error("priority queue is empty");
+    }
+
     const res = this.arr[0];
     this.arr[0] = this.arr[this.size - 1];
     this.size--;
@@ -66,7 +70,11 @@ export class PriorityQueue<T> {
     return res;
   }
 
-  public peek(): T {
+  public peek(): T | null {
+    if (this.size === 0) {
+      return null;
+    }
+
     return this.arr[0];
   }
 

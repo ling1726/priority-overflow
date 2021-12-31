@@ -46,6 +46,7 @@ export const Overflow: React.FC<OverflowProps> = (props) => {
       // console.log("visible", visibleItems);
       // console.log("invisible", invisibleItems);
 
+      // console.log(newState);
       return newState;
     });
   };

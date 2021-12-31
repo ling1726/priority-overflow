@@ -41,7 +41,7 @@ export interface ObserveOptions {
    * Padding (in px) at the end of the container before overflow occurs
    * Useful to account for extra elements (i.e. dropdown menu)
    * or to account for any kinds of margins between items which are hard to measure with JS
-   * @default 30
+   * @default 10
    */
   padding?: number;
   /**
@@ -70,7 +70,7 @@ export class OverflowManager {
     "end";
   private overflowAxis: NonNullable<ObserveOptions["overflowAxis"]> =
     "horizontal";
-  private padding: NonNullable<ObserveOptions["padding"]> = 0;
+  private padding: NonNullable<ObserveOptions["padding"]> = 10;
   /**
    * Priority queue of visible items to overflow
    */
@@ -223,9 +223,6 @@ export class OverflowManager {
 
     // Make sure that any overflow only items (i.e. dropdown menus) can actually be removed
     if (this.invisibleItemQueue.size === 1) {
-      const overflowOnlyItems = document.querySelectorAll(
-        `[${OVERFLOW_ONLY_ITEM}]`
-      );
       for (let i = 0; i < overflowOnlyItems.length; i++) {
         const overflowOnlyItem = overflowOnlyItems[i];
         if (overflowOnlyItem instanceof HTMLElement) {
