@@ -25,6 +25,7 @@ export interface OverflowProps extends React.HTMLAttributes<HTMLDivElement> {
   overflowDirection?: OverflowDirection;
   overflowAxis?: OverflowAxis;
   padding?: number;
+  minimumVisible?: number;
 }
 
 export const Overflow: React.FC<OverflowProps> = (props) => {
@@ -32,6 +33,7 @@ export const Overflow: React.FC<OverflowProps> = (props) => {
     overflowAxis = "horizontal",
     overflowDirection,
     padding,
+    minimumVisible,
     ...rest
   } = props;
   const styles = useStyles();
@@ -75,6 +77,7 @@ export const Overflow: React.FC<OverflowProps> = (props) => {
       overflowDirection,
       overflowAxis,
       padding,
+      minimumVisible,
     }
   );
 

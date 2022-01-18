@@ -20,7 +20,7 @@ export const useOverflowContainer = (
   update: OnUpdateOverflow,
   options: useOverflowContainerOptions = {}
 ) => {
-  const { overflowAxis, overflowDirection, padding } = options;
+  const { overflowAxis, overflowDirection, padding, minimumVisible } = options;
   // DOM ref to the overflow container element
   const containerRef = React.useRef<HTMLDivElement>(null);
   const updateOverflowItems = useEventCallback(update);
@@ -37,6 +37,7 @@ export const useOverflowContainer = (
       overflowDirection,
       overflowAxis,
       padding,
+      minimumVisible,
     });
 
     return () => {
@@ -48,6 +49,7 @@ export const useOverflowContainer = (
     overflowDirection,
     overflowAxis,
     padding,
+    minimumVisible,
   ]);
 
   const registerItem = React.useCallback(

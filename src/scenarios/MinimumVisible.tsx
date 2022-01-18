@@ -1,10 +1,8 @@
-import * as React from "react";
-import { TestOverflowItem as Unmemoized } from "../utils/TestOverflowItem";
+import React from "react";
 import { makeStyles } from "@fluentui/react-components";
 import { Overflow } from "../react/Overflow";
+import { TestOverflowItem } from "../utils/TestOverflowItem";
 import { OverflowMenu } from "../utils/OverflowMenu";
-
-const TestOverflowItem = React.memo(Unmemoized);
 
 const useStyles = makeStyles({
   container: {
@@ -18,8 +16,8 @@ function App() {
 
   return (
     <div className={styles.container}>
-      <h2>Memoized overflow items</h2>
-      <Overflow>
+      <h2>DOM order overflow</h2>
+      <Overflow minimumVisible={5}>
         {itemIds.map((_, i) => (
           <TestOverflowItem key={i} id={i} />
         ))}
@@ -28,4 +26,5 @@ function App() {
     </div>
   );
 }
+
 export default App;

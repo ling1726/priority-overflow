@@ -57,6 +57,11 @@ export interface ObserveOptions {
    * @default horizontal
    */
   overflowAxis?: OverflowAxis;
+
+  /**
+   * The minimum number of visible items
+   */
+  minimumVisible?: number;
 }
 
 export class OverflowManager {
@@ -90,6 +95,8 @@ export class OverflowManager {
    */
   private resizeObserver: ResizeObserver;
 
+  private minimumVisible: NonNullable<ObserveOptions["minimumVisible"]> = 0;
+
   constructor(onUpdateOverflow: OnUpdateOverflow) {
     this.visibleItemQueue = this.initVisibleItemQueue();
     this.invisibleItemQueue = this.initInvisibleItemQueue();
@@ -101,9 +108,11 @@ export class OverflowManager {
    * Start observing container size and child elements and manages overflow item visiblity
    */
   public observe(container: HTMLElement, options: ObserveOptions = {}) {
-    const { padding, overflowAxis, overflowDirection } = options;
+    const { padding, overflowAxis, overflowDirection, minimumVisible } =
+      options;
     this.container = container;
     this.padding = padding ?? this.padding;
+    this.minimumVisible = minimumVisible ?? this.minimumVisible;
     console.log(this.padding);
     this.overflowDirection = overflowDirection ?? this.overflowDirection;
     this.overflowAxis = overflowAxis ?? this.overflowAxis;
@@ -221,6 +230,9 @@ export class OverflowManager {
 
     // Remove items until there's no more overlap
     while (currentWidth > availableSize && this.visibleItemQueue.size > 0) {
+      if (this.visibleItemQueue.size === this.minimumVisible) {
+        break;
+      }
       currentWidth -= this.makeItemInvisible();
     }
 

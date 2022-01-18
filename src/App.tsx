@@ -13,12 +13,12 @@ import {
 } from "@fluentui/react-components";
 import DomOrder from "./scenarios/DomOrderOverflow";
 import Priority from "./scenarios/PriorityOverflow";
-import Memoized from "./scenarios/MemoizedOverflow";
 import ReverseDomOrder from "./scenarios/ReverseDomOrderOverflow";
 import Divider from "./scenarios/DividerOverflow";
 import DividerGroups from "./scenarios/DividerGroups";
 import DividerGroupsWithPriority from "./scenarios/DividerGroupsWithPriority";
 import FarItems from "./scenarios/FarItems";
+import MinimumVisible from "./scenarios/MinimumVisible";
 
 const useStyles = makeStyles({
   container: {
@@ -39,8 +39,8 @@ const useStyles = makeStyles({
 
 type Scenarios =
   | "dom"
+  | "minimumVisible"
   | "priority"
-  | "memoized"
   | "reverse"
   | "divider"
   | "dividerGroups"
@@ -75,11 +75,11 @@ function App() {
                 <MenuItemCheckbox name="scenario" value="reverse">
                   Reverse dom order
                 </MenuItemCheckbox>
+                <MenuItemCheckbox name="scenario" value="minimumVisible">
+                  Minimum visible items
+                </MenuItemCheckbox>
                 <MenuItemCheckbox name="scenario" value="priority">
                   Manual priority
-                </MenuItemCheckbox>
-                <MenuItemCheckbox name="scenario" value="memoized">
-                  Memoized
                 </MenuItemCheckbox>
                 <MenuItemCheckbox name="scenario" value="divider">
                   With dividers
@@ -111,13 +111,13 @@ function App() {
         {scenarios.includes("dom") && <DomOrder />}
         {scenarios.includes("reverse") && <ReverseDomOrder />}
         {scenarios.includes("priority") && <Priority />}
-        {scenarios.includes("memoized") && <Memoized />}
         {scenarios.includes("divider") && <Divider />}
         {scenarios.includes("farItems") && <FarItems />}
         {scenarios.includes("dividerGroups") && <DividerGroups />}
         {scenarios.includes("dividerGroupsPriority") && (
           <DividerGroupsWithPriority />
         )}
+        {scenarios.includes("minimumVisible") && <MinimumVisible />}
       </div>
     </FluentProvider>
   );
