@@ -11,7 +11,11 @@ const useStyles = makeStyles({
 });
 
 export const TestOverflowItem: React.FC<TestOverflowItemProps> = (props) => {
-  const ref = useOverflowItem<HTMLDivElement>(props.id, props.priority);
+  const ref = useOverflowItem<HTMLDivElement>(
+    props.id,
+    props.priority,
+    props.groupId
+  );
   const styles = useStyles();
 
   return (
@@ -24,5 +28,6 @@ export const TestOverflowItem: React.FC<TestOverflowItemProps> = (props) => {
 
 export interface TestOverflowItemProps {
   id: string | number;
+  groupId?: string | number;
   priority?: number;
 }

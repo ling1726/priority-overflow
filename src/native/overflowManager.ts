@@ -21,6 +21,8 @@ export interface OverflowItemEntry {
    * Specific id, used to track visibility and provide updates to consumers
    */
   id: string;
+
+  groupId?: string;
 }
 
 /**

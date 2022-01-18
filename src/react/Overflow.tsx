@@ -30,7 +30,11 @@ export const Overflow: React.FC<OverflowProps> = (props) => {
   const { overflowAxis = "horizontal", overflowDirection, ...rest } = props;
   const styles = useStyles();
   const [hasOverflow, setHasOverflow] = React.useState(false);
-  const [itemVisiblity, setItemVisibility] = React.useState<
+  const [itemVisibility, setItemVisibility] = React.useState<
+    Record<string, boolean>
+  >({});
+
+  const [groupVisibility, setGroupVisibility] = React.useState<
     Record<string, boolean>
   >({});
 
@@ -43,10 +47,18 @@ export const Overflow: React.FC<OverflowProps> = (props) => {
       const newState: Record<string, boolean> = {};
       visibleItems.forEach((x) => (newState[x.id] = true));
       invisibleItems.forEach((x) => (newState[x.id] = false));
-      // console.log("visible", visibleItems);
-      // console.log("invisible", invisibleItems);
+      return newState;
+    });
+    setGroupVisibility(() => {
+      const newState: Record<string, boolean> = {};
+      const groups = new Set<string>();
 
-      // console.log(newState);
+      visibleItems.forEach((x) => x.groupId && groups.add(x.groupId));
+
+      groups.forEach((group) => {
+        newState[group] = visibleItems.some((x) => x.groupId === group);
+      });
+
       return newState;
     });
   };
@@ -62,7 +74,8 @@ export const Overflow: React.FC<OverflowProps> = (props) => {
   return (
     <OverflowContext.Provider
       value={{
-        itemVisibility: itemVisiblity,
+        itemVisibility,
+        groupVisibility,
         hasOverflow,
         registerItem,
         updateOverflow,

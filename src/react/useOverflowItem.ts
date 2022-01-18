@@ -3,7 +3,8 @@ import { useOverflowContext } from "./overflowContext";
 
 export function useOverflowItem<TElement extends HTMLElement>(
   id: string | number,
-  priority?: number
+  priority?: number,
+  groupId?: string | number
 ) {
   const ref = React.useRef<TElement>(null);
   const registerItem = useOverflowContext((v) => v.registerItem);
@@ -17,13 +18,14 @@ export function useOverflowItem<TElement extends HTMLElement>(
         element: ref.current,
         id: id + "",
         priority: priority ?? 0,
+        groupId: groupId + "",
       });
     }
 
     return () => {
       deregisterItem();
     };
-  }, [id, priority, registerItem]);
+  }, [id, priority, registerItem, groupId]);
 
   return ref;
 }
