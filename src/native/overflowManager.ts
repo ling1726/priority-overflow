@@ -104,6 +104,7 @@ export class OverflowManager {
     const { padding, overflowAxis, overflowDirection } = options;
     this.container = container;
     this.padding = padding ?? this.padding;
+    console.log(this.padding);
     this.overflowDirection = overflowDirection ?? this.overflowDirection;
     this.overflowAxis = overflowAxis ?? this.overflowAxis;
 

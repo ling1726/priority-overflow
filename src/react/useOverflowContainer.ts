@@ -20,7 +20,7 @@ export const useOverflowContainer = (
   update: OnUpdateOverflow,
   options: useOverflowContainerOptions = {}
 ) => {
-  const { overflowAxis, overflowDirection } = options;
+  const { overflowAxis, overflowDirection, padding } = options;
   // DOM ref to the overflow container element
   const containerRef = React.useRef<HTMLDivElement>(null);
   const updateOverflowItems = useEventCallback(update);
@@ -36,12 +36,19 @@ export const useOverflowContainer = (
     overflowManager.observe(containerRef.current, {
       overflowDirection,
       overflowAxis,
+      padding,
     });
 
     return () => {
       overflowManager.disconnect();
     };
-  }, [updateOverflowItems, overflowManager, overflowDirection, overflowAxis]);
+  }, [
+    updateOverflowItems,
+    overflowManager,
+    overflowDirection,
+    overflowAxis,
+    padding,
+  ]);
 
   const registerItem = React.useCallback(
     (item: OverflowItemEntry) => {

@@ -24,10 +24,16 @@ const useStyles = makeStyles({
 export interface OverflowProps extends React.HTMLAttributes<HTMLDivElement> {
   overflowDirection?: OverflowDirection;
   overflowAxis?: OverflowAxis;
+  padding?: number;
 }
 
 export const Overflow: React.FC<OverflowProps> = (props) => {
-  const { overflowAxis = "horizontal", overflowDirection, ...rest } = props;
+  const {
+    overflowAxis = "horizontal",
+    overflowDirection,
+    padding,
+    ...rest
+  } = props;
   const styles = useStyles();
   const [hasOverflow, setHasOverflow] = React.useState(false);
   const [itemVisibility, setItemVisibility] = React.useState<
@@ -68,6 +74,7 @@ export const Overflow: React.FC<OverflowProps> = (props) => {
     {
       overflowDirection,
       overflowAxis,
+      padding,
     }
   );
 

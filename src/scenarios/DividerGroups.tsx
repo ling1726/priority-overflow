@@ -3,7 +3,6 @@ import { makeStyles } from "@fluentui/react-components";
 import { TestOverflowItem } from "../utils/TestOverflowItem";
 import { Overflow } from "../react/Overflow";
 import { OverflowMenu } from "../utils/OverflowMenu";
-import { useOverflowItem } from "../react/useOverflowItem";
 import { useIsOverflowGroupVisible } from "../react/useIsOverflowGroupVisible";
 
 const useStyles = makeStyles({
@@ -18,7 +17,7 @@ function App() {
   return (
     <div className={styles.container}>
       <h2>Rendering dividers with groups</h2>
-      <Overflow overflowDirection="start">
+      <Overflow overflowDirection="start" padding={30}>
         <TestOverflowItem id={1} groupId={1} />
         <TestOverflowGroupDivider id={`divider-${1}`} groupId={1} />
         <TestOverflowItem id={2} groupId={2} />
@@ -53,7 +52,6 @@ const useDividerStyles = makeStyles({
 export const TestOverflowGroupDivider: React.FC<TestOverflowItemProps> = (
   props
 ) => {
-  const ref = useOverflowItem<HTMLDivElement>(props.id, props.priority);
   const styles = useDividerStyles();
   const isGroupVisible = useIsOverflowGroupVisible(props.groupId);
 
@@ -62,7 +60,7 @@ export const TestOverflowGroupDivider: React.FC<TestOverflowItemProps> = (
   }
 
   return (
-    <div ref={ref} className={styles.outer}>
+    <div className={styles.outer}>
       <div className={styles.inner} />
     </div>
   );
