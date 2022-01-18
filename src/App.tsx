@@ -17,6 +17,7 @@ import Memoized from "./scenarios/MemoizedOverflow";
 import ReverseDomOrder from "./scenarios/ReverseDomOrderOverflow";
 import Divider from "./scenarios/DividerOverflow";
 import DividerGroups from "./scenarios/DividerGroups";
+import DividerGroupsWithPriority from "./scenarios/DividerGroupsWithPriority";
 import FarItems from "./scenarios/FarItems";
 
 const useStyles = makeStyles({
@@ -43,6 +44,7 @@ type Scenarios =
   | "reverse"
   | "divider"
   | "dividerGroups"
+  | "dividerGroupsPriority"
   | "farItems";
 
 function App() {
@@ -88,6 +90,9 @@ function App() {
                 <MenuItemCheckbox name="scenario" value="dividerGroups">
                   With divider groups
                 </MenuItemCheckbox>
+                <MenuItemCheckbox name="scenario" value="dividerGroupsPriority">
+                  With divider groups and priority
+                </MenuItemCheckbox>
               </MenuList>
             </MenuPopover>
           </Menu>
@@ -110,6 +115,9 @@ function App() {
         {scenarios.includes("divider") && <Divider />}
         {scenarios.includes("farItems") && <FarItems />}
         {scenarios.includes("dividerGroups") && <DividerGroups />}
+        {scenarios.includes("dividerGroupsPriority") && (
+          <DividerGroupsWithPriority />
+        )}
       </div>
     </FluentProvider>
   );
