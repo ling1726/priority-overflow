@@ -3,7 +3,7 @@ import {
   MenuButton,
   makeStyles,
   Menu,
-  MenuItemCheckbox,
+  MenuItemRadio,
   MenuList,
   MenuPopover,
   MenuTrigger,
@@ -69,30 +69,30 @@ function App() {
 
             <MenuPopover>
               <MenuList className={styles.menu}>
-                <MenuItemCheckbox name="scenario" value="dom">
+                <MenuItemRadio name="scenario" value="dom">
                   Dom order
-                </MenuItemCheckbox>
-                <MenuItemCheckbox name="scenario" value="reverse">
+                </MenuItemRadio>
+                <MenuItemRadio name="scenario" value="reverse">
                   Reverse dom order
-                </MenuItemCheckbox>
-                <MenuItemCheckbox name="scenario" value="minimumVisible">
+                </MenuItemRadio>
+                <MenuItemRadio name="scenario" value="minimumVisible">
                   Minimum visible items
-                </MenuItemCheckbox>
-                <MenuItemCheckbox name="scenario" value="priority">
+                </MenuItemRadio>
+                <MenuItemRadio name="scenario" value="priority">
                   Manual priority
-                </MenuItemCheckbox>
-                <MenuItemCheckbox name="scenario" value="farItems">
+                </MenuItemRadio>
+                <MenuItemRadio name="scenario" value="farItems">
                   Far Items
-                </MenuItemCheckbox>
-                <MenuItemCheckbox name="scenario" value="divider">
+                </MenuItemRadio>
+                <MenuItemRadio name="scenario" value="divider">
                   With dividers
-                </MenuItemCheckbox>
-                <MenuItemCheckbox name="scenario" value="dividerGroups">
+                </MenuItemRadio>
+                <MenuItemRadio name="scenario" value="dividerGroups">
                   With divider groups
-                </MenuItemCheckbox>
-                <MenuItemCheckbox name="scenario" value="dividerGroupsPriority">
+                </MenuItemRadio>
+                <MenuItemRadio name="scenario" value="dividerGroupsPriority">
                   With divider groups and priority
-                </MenuItemCheckbox>
+                </MenuItemRadio>
               </MenuList>
             </MenuPopover>
           </Menu>

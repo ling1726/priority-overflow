@@ -16,7 +16,7 @@ function App() {
 
   return (
     <div className={styles.container}>
-      <h2>DOM order overflow</h2>
+      <h2>Minimum visible items</h2>
       <Overflow minimumVisible={5}>
         {itemIds.map((_, i) => (
           <TestOverflowItem key={i} id={i} />
