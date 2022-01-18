@@ -81,11 +81,11 @@ function App() {
                 <MenuItemCheckbox name="scenario" value="priority">
                   Manual priority
                 </MenuItemCheckbox>
-                <MenuItemCheckbox name="scenario" value="divider">
-                  With dividers
-                </MenuItemCheckbox>
                 <MenuItemCheckbox name="scenario" value="farItems">
                   Far Items
+                </MenuItemCheckbox>
+                <MenuItemCheckbox name="scenario" value="divider">
+                  With dividers
                 </MenuItemCheckbox>
                 <MenuItemCheckbox name="scenario" value="dividerGroups">
                   With divider groups
