@@ -19,6 +19,8 @@ import DividerGroups from "./scenarios/DividerGroups";
 import DividerGroupsWithPriority from "./scenarios/DividerGroupsWithPriority";
 import FarItems from "./scenarios/FarItems";
 import MinimumVisible from "./scenarios/MinimumVisible";
+import NorthstarToolbar from "./scenarios/NorthstarToolbar";
+import NorthstarToolbarDividerGroups from "./scenarios/NorthstarToolbarDividerGroups";
 
 const useStyles = makeStyles({
   container: {
@@ -45,6 +47,8 @@ type Scenarios =
   | "divider"
   | "dividerGroups"
   | "dividerGroupsPriority"
+  | "northstar"
+  | "northstarDividerGroup"
   | "farItems";
 
 function App() {
@@ -93,6 +97,12 @@ function App() {
                 <MenuItemRadio name="scenario" value="dividerGroupsPriority">
                   With divider groups and priority
                 </MenuItemRadio>
+                <MenuItemRadio name="scenario" value="northstar">
+                  Northstar toolbar
+                </MenuItemRadio>
+                <MenuItemRadio name="scenario" value="northstarDividerGroup">
+                  Northstar toolbar divider groups
+                </MenuItemRadio>
               </MenuList>
             </MenuPopover>
           </Menu>
@@ -118,6 +128,10 @@ function App() {
           <DividerGroupsWithPriority />
         )}
         {scenarios.includes("minimumVisible") && <MinimumVisible />}
+        {scenarios.includes("northstar") && <NorthstarToolbar />}
+        {scenarios.includes("northstarDividerGroup") && (
+          <NorthstarToolbarDividerGroups />
+        )}
       </div>
     </FluentProvider>
   );
