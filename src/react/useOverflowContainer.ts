@@ -7,13 +7,6 @@ import {
 } from "../native/overflowManager";
 import { useEventCallback } from "../utils/useEventCallback";
 
-export interface OnUpdateOverflowData {
-  visibleItems: OverflowItemEntry[];
-  invisibleItems: OverflowItemEntry[];
-  startItem?: OverflowItemEntry;
-  endItem?: OverflowItemEntry;
-}
-
 export interface useOverflowContainerOptions extends ObserveOptions {}
 
 export const useOverflowContainer = (

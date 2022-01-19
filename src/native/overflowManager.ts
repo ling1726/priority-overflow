@@ -2,6 +2,7 @@ import { PriorityQueue } from "./priorityQueue";
 
 export type OverflowDirection = "start" | "end";
 export type OverflowAxis = "horizontal" | "vertical";
+export type OverflowGroupState = "visible" | "hidden" | "overflow";
 /** Indicates that this item can be overflowed */
 export const OVERFLOW_ITEM_DATA = "data-overflow-item";
 export const OVERFLOW_ITEM_INVISIBLE = "data-overflow-invisible";
@@ -36,6 +37,7 @@ export type OnUpdateOverflow = (data: OverflowEventPayload) => void;
 export interface OverflowEventPayload {
   visibleItems: OverflowItemEntry[];
   invisibleItems: OverflowItemEntry[];
+  groupVisibility: Record<string, OverflowGroupState>;
 }
 
 export interface ObserveOptions {
@@ -90,6 +92,11 @@ export class OverflowManager {
    * Collection of all managed overflow items
    */
   private overflowItems: Record<string, OverflowItemEntry> = {};
+
+  private overflowGroups: Record<
+    string,
+    { visibleItemIds: Set<string>; invisibleItemIds: Set<string> }
+  > = {};
   /**
    * Watches for changes to container size
    */
@@ -137,6 +144,17 @@ export class OverflowManager {
       item.element.setAttribute(OVERFLOW_ITEM_DATA, item.id);
       this.overflowItems[item.id] = item;
       this.visibleItemQueue.enqueue(item.id);
+
+      if (item.groupId) {
+        if (!this.overflowGroups[item.groupId]) {
+          this.overflowGroups[item.groupId] = {
+            visibleItemIds: new Set<string>(),
+            invisibleItemIds: new Set<string>(),
+          };
+        }
+
+        this.overflowGroups[item.groupId].visibleItemIds.add(item.id);
+      }
     });
   }
 
@@ -146,10 +164,17 @@ export class OverflowManager {
    * @param itemId
    */
   public removeItem(itemId: string) {
-    this.overflowItems[itemId].element.removeAttribute(OVERFLOW_ITEM_DATA);
-    delete this.overflowItems[itemId];
+    const item = this.overflowItems[itemId];
+    item.element.removeAttribute(OVERFLOW_ITEM_DATA);
     this.visibleItemQueue.remove(itemId);
     this.invisibleItemQueue.remove(itemId);
+
+    if (item.groupId) {
+      this.overflowGroups[item.groupId].visibleItemIds.delete(item.id);
+      this.overflowGroups[item.groupId].invisibleItemIds.delete(item.id);
+    }
+
+    delete this.overflowItems[itemId];
   }
 
   /**
@@ -268,6 +293,11 @@ export class OverflowManager {
     const item = this.overflowItems[nextVisible];
     item.element.style.display = "";
     item.element.removeAttribute(OVERFLOW_ITEM_INVISIBLE);
+    if (item.groupId) {
+      this.overflowGroups[item.groupId].invisibleItemIds.delete(item.id);
+      this.overflowGroups[item.groupId].visibleItemIds.add(item.id);
+    }
+
     return this.getOffsetSize(item.element);
   }
 
@@ -279,6 +309,11 @@ export class OverflowManager {
     const width = this.getOffsetSize(item.element);
     item.element.style.display = "none";
     item.element.setAttribute(OVERFLOW_ITEM_INVISIBLE, "");
+    if (item.groupId) {
+      this.overflowGroups[item.groupId].visibleItemIds.delete(item.id);
+      this.overflowGroups[item.groupId].invisibleItemIds.add(item.id);
+    }
+
     return width;
   }
 
@@ -293,7 +328,19 @@ export class OverflowManager {
       (itemId) => this.overflowItems[itemId]
     );
 
-    this.onUpdateOverflow?.({ visibleItems, invisibleItems });
+    const groupVisibility: Record<string, OverflowGroupState> = {};
+    Object.entries(this.overflowGroups).forEach((entry) => {
+      const groupId = entry[0];
+      if (entry[1].invisibleItemIds.size && entry[1].visibleItemIds.size) {
+        groupVisibility[groupId] = "overflow";
+      } else if (entry[1].visibleItemIds.size === 0) {
+        groupVisibility[groupId] = "hidden";
+      } else {
+        groupVisibility[groupId] = "visible";
+      }
+    });
+
+    this.onUpdateOverflow?.({ visibleItems, invisibleItems, groupVisibility });
   }
 
   private initInvisibleItemQueue() {

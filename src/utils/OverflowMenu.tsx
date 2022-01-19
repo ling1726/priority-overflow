@@ -8,8 +8,9 @@ import {
 import * as React from "react";
 import { useOverflowMenu } from "../react/useOverflowMenu";
 import { TestOverflowMenuItem } from "./TestOverflowMenuItem";
+import { TestOverflowMenuDivider } from "./TestOverflowMenuDivider";
 
-export const OverflowMenu: React.FC<{ itemIds: string[] | number[] }> = ({
+export const OverflowMenu: React.FC<{ itemIds: (string | number)[] }> = ({
   itemIds,
 }) => {
   const { ref, overflowCount, isOverflowing } =
@@ -29,7 +30,7 @@ export const OverflowMenu: React.FC<{ itemIds: string[] | number[] }> = ({
         <MenuList>
           {itemIds.map((i) => {
             if (typeof i === "string" && i.startsWith("divider")) {
-              return null;
+              return <TestOverflowMenuDivider key={i} id={i} />;
             }
             return <TestOverflowMenuItem key={i} id={i} />;
           })}

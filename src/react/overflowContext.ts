@@ -3,11 +3,14 @@ import {
   createContext,
   useContextSelector,
 } from "@fluentui/react-context-selector";
-import { OverflowItemEntry } from "../native/overflowManager";
+import {
+  OverflowGroupState,
+  OverflowItemEntry,
+} from "../native/overflowManager";
 
 export interface OverflowContextValue {
   itemVisibility: Record<string, boolean>;
-  groupVisibility: Record<string, boolean>;
+  groupVisibility: Record<string, OverflowGroupState>;
   hasOverflow: boolean;
   registerItem: (item: OverflowItemEntry) => () => void;
   updateOverflow: (padding?: number) => void;

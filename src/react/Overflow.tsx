@@ -6,6 +6,7 @@ import {
   OnUpdateOverflow,
   OverflowAxis,
   OverflowDirection,
+  OverflowGroupState,
 } from "../native/overflowManager";
 
 const useStyles = makeStyles({
@@ -43,12 +44,13 @@ export const Overflow: React.FC<OverflowProps> = (props) => {
   >({});
 
   const [groupVisibility, setGroupVisibility] = React.useState<
-    Record<string, boolean>
+    Record<string, OverflowGroupState>
   >({});
 
   const updateItemVisibility: OnUpdateOverflow = ({
     visibleItems,
     invisibleItems,
+    groupVisibility,
   }) => {
     setHasOverflow(() => invisibleItems.length > 0);
     setItemVisibility(() => {
@@ -57,18 +59,7 @@ export const Overflow: React.FC<OverflowProps> = (props) => {
       invisibleItems.forEach((x) => (newState[x.id] = false));
       return newState;
     });
-    setGroupVisibility(() => {
-      const newState: Record<string, boolean> = {};
-      const groups = new Set<string>();
-
-      visibleItems.forEach((x) => x.groupId && groups.add(x.groupId));
-
-      groups.forEach((group) => {
-        newState[group] = visibleItems.some((x) => x.groupId === group);
-      });
-
-      return newState;
-    });
+    setGroupVisibility(groupVisibility);
   };
 
   const { containerRef, registerItem, updateOverflow } = useOverflowContainer(
