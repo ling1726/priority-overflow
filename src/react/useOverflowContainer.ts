@@ -54,12 +54,9 @@ export const useOverflowContainer = (
     [overflowManager]
   );
 
-  const updateOverflow = React.useCallback(
-    (padding?: number) => {
-      overflowManager.updateOverflow(padding);
-    },
-    [overflowManager]
-  );
+  const updateOverflow = React.useCallback(() => {
+    overflowManager.updateOverflow();
+  }, [overflowManager]);
 
   return {
     containerRef,

@@ -21,6 +21,7 @@ import FarItems from "./scenarios/FarItems";
 import MinimumVisible from "./scenarios/MinimumVisible";
 import NorthstarToolbar from "./scenarios/NorthstarToolbar";
 import NorthstarToolbarDividerGroups from "./scenarios/NorthstarToolbarDividerGroups";
+import Selection from "./scenarios/Selection";
 
 const useStyles = makeStyles({
   container: {
@@ -49,11 +50,12 @@ type Scenarios =
   | "dividerGroupsPriority"
   | "northstar"
   | "northstarDividerGroup"
+  | "selection"
   | "farItems";
 
 function App() {
   const styles = useStyles();
-  const [scenarios, setScenarios] = React.useState<Scenarios[]>(["dom"]);
+  const [scenarios, setScenarios] = React.useState<Scenarios[]>(["selection"]);
   const onCheckedChange: MenuProps["onCheckedValueChange"] = (e, data) => {
     setScenarios(data.checkedItems as Scenarios[]);
   };
@@ -103,6 +105,9 @@ function App() {
                 <MenuItemRadio name="scenario" value="northstarDividerGroup">
                   Northstar toolbar divider groups
                 </MenuItemRadio>
+                <MenuItemRadio name="scenario" value="selection">
+                  Selection
+                </MenuItemRadio>
               </MenuList>
             </MenuPopover>
           </Menu>
@@ -132,6 +137,7 @@ function App() {
         {scenarios.includes("northstarDividerGroup") && (
           <NorthstarToolbarDividerGroups />
         )}
+        {scenarios.includes("selection") && <Selection />}
       </div>
     </FluentProvider>
   );

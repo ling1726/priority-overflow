@@ -92,6 +92,10 @@ export class PriorityQueue<T> {
     }
   }
 
+  public contains(val: T) {
+    return this.arr.find((x) => x === val);
+  }
+
   public clear() {
     this.size = 0;
   }

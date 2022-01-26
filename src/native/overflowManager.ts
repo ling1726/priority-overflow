@@ -1,3 +1,4 @@
+import debounce from "./debounce";
 import { PriorityQueue } from "./priorityQueue";
 
 export type OverflowDirection = "start" | "end";
@@ -156,6 +157,8 @@ export class OverflowManager {
         this.overflowGroups[item.groupId].visibleItemIds.add(item.id);
       }
     });
+
+    this.updateOverflow();
   }
 
   /**
@@ -169,12 +172,16 @@ export class OverflowManager {
     this.visibleItemQueue.remove(itemId);
     this.invisibleItemQueue.remove(itemId);
 
+    item.element.style.display = "";
+    item.element.removeAttribute(OVERFLOW_ITEM_INVISIBLE);
+
     if (item.groupId) {
       this.overflowGroups[item.groupId].visibleItemIds.delete(item.id);
       this.overflowGroups[item.groupId].invisibleItemIds.delete(item.id);
     }
 
     delete this.overflowItems[itemId];
+    this.updateOverflow();
   }
 
   /**
@@ -182,19 +189,25 @@ export class OverflowManager {
    * Useful when new elements are inserted into the container after the overflow update
    * i.e. extra dividers or menus
    */
-  public updateOverflow(padding?: number) {
+  public updateOverflow = debounce(
+    () =>
+      new Promise<void>((resolve) => {
+        this.forceUpdate();
+        resolve();
+      })
+  );
+
+  public forceUpdate = () => {
     if (!this.container) {
       return;
-    }
-
-    if (padding !== undefined) {
-      this.padding = padding;
     }
 
     this.processOverflowItems(
       this.getOffsetSize(this.container) - this.padding
     );
-  }
+
+    console.log("forceUpdate");
+  };
 
   private initResizeObserver() {
     return new ResizeObserver((entries) => {
@@ -291,7 +304,7 @@ export class OverflowManager {
     this.visibleItemQueue.enqueue(nextVisible);
 
     const item = this.overflowItems[nextVisible];
-    item.element.style.display = "";
+    item.element.style.display = ""; // TODO remove this and apply through css in scenarios
     item.element.removeAttribute(OVERFLOW_ITEM_INVISIBLE);
     if (item.groupId) {
       this.overflowGroups[item.groupId].invisibleItemIds.delete(item.id);
@@ -307,7 +320,7 @@ export class OverflowManager {
 
     const item = this.overflowItems[nextInvisible];
     const width = this.getOffsetSize(item.element);
-    item.element.style.display = "none";
+    item.element.style.display = "none"; // TODO remove this and apply through css in scenarios
     item.element.setAttribute(OVERFLOW_ITEM_INVISIBLE, "");
     if (item.groupId) {
       this.overflowGroups[item.groupId].visibleItemIds.delete(item.id);
