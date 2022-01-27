@@ -121,7 +121,6 @@ export class OverflowManager {
     this.container = container;
     this.padding = padding ?? this.padding;
     this.minimumVisible = minimumVisible ?? this.minimumVisible;
-    console.log(this.padding);
     this.overflowDirection = overflowDirection ?? this.overflowDirection;
     this.overflowAxis = overflowAxis ?? this.overflowAxis;
 
@@ -185,7 +184,7 @@ export class OverflowManager {
   }
 
   /**
-   * Manually runs the overflow calculation.
+   * Manually runs the overflow calculation that is async and debounced.
    * Useful when new elements are inserted into the container after the overflow update
    * i.e. extra dividers or menus
    */
@@ -197,6 +196,9 @@ export class OverflowManager {
       })
   );
 
+  /**
+   * Manually runs the overflow calculation sync
+   */
   public forceUpdate = () => {
     if (!this.container) {
       return;
@@ -205,8 +207,6 @@ export class OverflowManager {
     this.processOverflowItems(
       this.getOffsetSize(this.container) - this.padding
     );
-
-    console.log("forceUpdate");
   };
 
   private initResizeObserver() {
