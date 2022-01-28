@@ -304,6 +304,7 @@ export class OverflowManager {
     this.visibleItemQueue.enqueue(nextVisible);
 
     const item = this.overflowItems[nextVisible];
+    // Possible extension to allow consumer to do their own hiding logic
     item.element.style.display = ""; // TODO remove this and apply through css in scenarios
     item.element.removeAttribute(OVERFLOW_ITEM_INVISIBLE);
     if (item.groupId) {
