@@ -57,7 +57,9 @@ type Scenarios =
 
 function App() {
   const styles = useStyles();
-  const [scenarios, setScenarios] = React.useState<Scenarios[]>(["dom"]);
+  const [scenarios, setScenarios] = React.useState<Scenarios[]>([
+    "northstarPopovers",
+  ]);
   const onCheckedChange: MenuProps["onCheckedValueChange"] = (e, data) => {
     setScenarios(data.checkedItems as Scenarios[]);
   };
