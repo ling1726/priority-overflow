@@ -47,6 +47,7 @@ export function toolbarReducer(
     case "OverflowMenuOpen":
       return { ...state, overflowMenu: true };
 
+    // overflow menu closing needs to close all of its submenus
     case "OverflowMenuClose":
       return { ...state, overflowMenu: false, paragraph: false, table: false };
 
