@@ -9,19 +9,23 @@ export type ToolbarState = {
   table: false | "main" | "overflow";
   paragraph: false | "main" | "overflow";
   target: HTMLButtonElement | null;
+  overflowMenu: boolean;
 };
 
 export type ToolbarAction =
   | { type: "Link"; value: boolean }
   | { type: "Table"; value: false | "main" | "overflow" }
   | { type: "Paragraph"; value: false | "main" | "overflow" }
-  | { type: "Target"; value: HTMLButtonElement };
+  | { type: "Target"; value: HTMLButtonElement }
+  | { type: "OverflowMenuOpen" }
+  | { type: "OverflowMenuClose" };
 
 export const initialState: ToolbarState = {
   link: false,
   table: false,
   paragraph: false,
   target: null,
+  overflowMenu: false,
 };
 
 export function toolbarReducer(
@@ -40,6 +44,12 @@ export function toolbarReducer(
     case "Target":
       return { ...state, target: action.value };
 
+    case "OverflowMenuOpen":
+      return { ...state, overflowMenu: true };
+
+    case "OverflowMenuClose":
+      return { ...state, overflowMenu: false, paragraph: false, table: false };
+
     default:
       throw new Error("unknown action in toolbar reducer");
   }
@@ -56,6 +66,7 @@ export const ToolbarContext = createContext<ToolbarContextValue>({
   dispatch: () => null,
   target: null,
   eventTarget: null,
+  overflowMenu: false,
 });
 
 export const useToolbarContext = <T>(

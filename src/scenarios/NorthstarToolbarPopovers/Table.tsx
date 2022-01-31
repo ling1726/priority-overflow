@@ -11,6 +11,11 @@ import { OverflowMenuItem } from "./OverflowMenuItem";
 import { OverflowToolbarItem } from "./OverflowToolbarItem";
 import { useToolbarContext } from "./state";
 
+/**
+ * This item renders the same Popover but in two different places
+ * It would be possible to use the same popover in different targets
+ * however, that would increase the amount of state management code and increase complexity
+ */
 export const TableOverflowItem: React.FC = () => {
   const isOverflowing = !useIsOverflowItemVisible("Table");
   let open = useToolbarContext((v) => v.table === "main");

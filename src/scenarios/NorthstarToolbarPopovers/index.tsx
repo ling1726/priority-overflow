@@ -22,6 +22,7 @@ import {
   Menu,
   MenuList,
   MenuPopover,
+  MenuProps,
   MenuTrigger,
 } from "@fluentui/react-components";
 import { Overflow } from "../../react/Overflow";
@@ -136,13 +137,16 @@ function Example() {
   );
 }
 
-export const OverflowMenu: React.FC = (props) => {
+export const OverflowMenu: React.FC = () => {
   const { ref, isOverflowing } = useOverflowMenu<HTMLButtonElement>();
   const dispatch = useToolbarContext((v) => v.dispatch);
+  const open = useToolbarContext((v) => v.overflowMenu);
   const target = useToolbarContext((v) => v.target);
   const eventTarget = useToolbarContext((v) => v.eventTarget);
   const popperRef = React.useRef<PopperRefHandle | null>(null);
 
+  // Popper can handle window resize, but if the overflow is not a result of window resize the popovers will not
+  // update their positions to follow their targets
   React.useEffect(() => {
     const listener = () => {
       if (popperRef.current) {
@@ -164,6 +168,19 @@ export const OverflowMenu: React.FC = (props) => {
   );
   const mergedRef = useMergedRefs(ref, targetRef);
 
+  const onOpenChange = React.useCallback<
+    NonNullable<MenuProps["onOpenChange"]>
+  >(
+    (e, data) => {
+      if (data.open) {
+        dispatch({ type: "OverflowMenuOpen" });
+      } else {
+        dispatch({ type: "OverflowMenuClose" });
+      }
+    },
+    [dispatch]
+  );
+
   if (!isOverflowing) {
     return null;
   }
@@ -178,7 +195,7 @@ export const OverflowMenu: React.FC = (props) => {
 
   return (
     <>
-      <Menu positioning={{ popperRef }}>
+      <Menu open={open} positioning={{ popperRef }} onOpenChange={onOpenChange}>
         <MenuTrigger>
           <ToolbarItem ref={mergedRef} icon={<MoreIcon />} />
         </MenuTrigger>

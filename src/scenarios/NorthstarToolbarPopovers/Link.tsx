@@ -11,17 +11,18 @@ import { LinkIcon, PopperRefHandle } from "@fluentui/react-northstar";
 import { OverflowToolbarItem } from "./OverflowToolbarItem";
 import { OverflowMenuItem } from "./OverflowMenuItem";
 
+/**
+ * This overflow item will anchor the popover to the overflow menu trigger
+ * Will use a target passed from context to anchor the popover if the item is overflowing
+ */
 export const LinkOverflowItem: React.FC = () => {
-  // reduce initial render
-  // was ever visible ? -> bailout of rendering popover completely
-  // imperative API can allow conditional rendering
-
   const dispatch = useToolbarContext((v) => v.dispatch);
   const open = useToolbarContext((v) => v.link);
   const ctxTarget = useToolbarContext((v) => v.target);
   const overflowing = !useIsOverflowItemVisible("Link");
   const eventTarget = useToolbarContext((v) => v.eventTarget);
   const popperRef = React.useRef<PopperRefHandle | null>(null);
+  // Popper should follow target on container resize
   React.useEffect(() => {
     const listener = (e: CustomEvent) => {
       if (popperRef.current) {
@@ -41,6 +42,10 @@ export const LinkOverflowItem: React.FC = () => {
 
   const target = overflowing ? ctxTarget : undefined;
 
+  // Can use manual target and not wrap the toolbar item at all
+  // This would reduce the components rendered on initial render
+  // However, would induce extra code to handle a11y behaviour (focus management)
+  // Imperative popperRef.setTarget API would help here
   return (
     <Popover
       open={open}

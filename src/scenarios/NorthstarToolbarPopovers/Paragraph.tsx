@@ -13,6 +13,11 @@ import { OverflowMenuItem } from "./OverflowMenuItem";
 import { OverflowToolbarItem } from "./OverflowToolbarItem";
 import { useToolbarContext } from "./state";
 
+/**
+ * This item renders the same Menu but in two different places.
+ * This is preferrable because composition of Menu will give all the default a11y behaviours of
+ * nested menus for free
+ */
 export const ParagraphOverflowItem: React.FC = () => {
   const isOverflowing = !useIsOverflowItemVisible("Paragraph");
   let open = useToolbarContext((v) => v.paragraph === "main");
