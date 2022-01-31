@@ -18,7 +18,13 @@ import { useToolbarContext } from "./state";
  */
 export const TableOverflowItem: React.FC = () => {
   const isOverflowing = !useIsOverflowItemVisible("Table");
-  let open = useToolbarContext((v) => v.table === "main");
+  const open = useToolbarContext((v) => {
+    if (isOverflowing) {
+      return false;
+    }
+
+    return v.table;
+  });
   const dispatch = useToolbarContext((v) => v.dispatch);
 
   React.useEffect(() => {
@@ -28,12 +34,8 @@ export const TableOverflowItem: React.FC = () => {
   }, [isOverflowing, dispatch]);
 
   const onOpenChange: PopoverProps["onOpenChange"] = (e, data) => {
-    dispatch({ type: "Table", value: data.open ? "main" : false });
+    dispatch({ type: "Table", value: data.open });
   };
-
-  if (isOverflowing) {
-    open = false;
-  }
 
   return (
     <Popover open={open} onOpenChange={onOpenChange}>
@@ -49,11 +51,11 @@ export const TableOverflowItem: React.FC = () => {
 
 export const TableOverflowMenuItem: React.FC = () => {
   const isOverflowing = !useIsOverflowItemVisible("Table");
-  const open = useToolbarContext((v) => v.table === "overflow");
+  const open = useToolbarContext((v) => v.table);
   const dispatch = useToolbarContext((v) => v.dispatch);
 
   const onOpenChange: PopoverProps["onOpenChange"] = (e, data) => {
-    dispatch({ type: "Table", value: data.open ? "overflow" : false });
+    dispatch({ type: "Table", value: data.open });
   };
 
   React.useEffect(() => {

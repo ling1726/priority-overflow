@@ -6,16 +6,16 @@ import {
 
 export type ToolbarState = {
   link: boolean;
-  table: false | "main" | "overflow";
-  paragraph: false | "main" | "overflow";
+  table: boolean;
+  paragraph: boolean;
   target: HTMLButtonElement | null;
   overflowMenu: boolean;
 };
 
 export type ToolbarAction =
   | { type: "Link"; value: boolean }
-  | { type: "Table"; value: false | "main" | "overflow" }
-  | { type: "Paragraph"; value: false | "main" | "overflow" }
+  | { type: "Table"; value: boolean }
+  | { type: "Paragraph"; value: boolean }
   | { type: "Target"; value: HTMLButtonElement }
   | { type: "OverflowMenuOpen" }
   | { type: "OverflowMenuClose" };

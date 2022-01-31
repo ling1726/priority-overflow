@@ -20,7 +20,13 @@ import { useToolbarContext } from "./state";
  */
 export const ParagraphOverflowItem: React.FC = () => {
   const isOverflowing = !useIsOverflowItemVisible("Paragraph");
-  let open = useToolbarContext((v) => v.paragraph === "main");
+  const open = useToolbarContext((v) => {
+    if (isOverflowing) {
+      return false;
+    }
+
+    return v.paragraph;
+  });
   const dispatch = useToolbarContext((v) => v.dispatch);
 
   React.useEffect(() => {
@@ -30,12 +36,8 @@ export const ParagraphOverflowItem: React.FC = () => {
   }, [isOverflowing, dispatch]);
 
   const onOpenChange: MenuProps["onOpenChange"] = (e, data) => {
-    dispatch({ type: "Paragraph", value: data.open ? "main" : false });
+    dispatch({ type: "Paragraph", value: data.open });
   };
-
-  if (isOverflowing) {
-    open = false;
-  }
 
   return (
     <Menu open={open} onOpenChange={onOpenChange}>
@@ -67,11 +69,11 @@ export const ParagraphOverflowItem: React.FC = () => {
 
 export const ParagraphOverflowMenuItem: React.FC = () => {
   const isOverflowing = !useIsOverflowItemVisible("Paragraph");
-  const open = useToolbarContext((v) => v.paragraph === "overflow");
+  const open = useToolbarContext((v) => v.paragraph);
   const dispatch = useToolbarContext((v) => v.dispatch);
 
   const onOpenChange: MenuProps["onOpenChange"] = (e, data) => {
-    dispatch({ type: "Paragraph", value: data.open ? "overflow" : false });
+    dispatch({ type: "Paragraph", value: data.open });
   };
 
   React.useEffect(() => {
