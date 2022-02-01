@@ -1,5 +1,6 @@
 import * as React from "react";
 import {
+  Button,
   Popover,
   PopoverProps,
   PopoverSurface,
@@ -17,6 +18,8 @@ import { OverflowMenuItem } from "./OverflowMenuItem";
  */
 export const LinkOverflowItem: React.FC = () => {
   const dispatch = useToolbarContext((v) => v.dispatch);
+  // Workaround for tabster/focuszone incompatibility
+  const toolbarItemRef = React.useRef<HTMLButtonElement>(null);
   const open = useToolbarContext((v) => v.link);
   const ctxTarget = useToolbarContext((v) => v.target);
   const overflowing = !useIsOverflowItemVisible("Link");
@@ -40,6 +43,16 @@ export const LinkOverflowItem: React.FC = () => {
     dispatch({ type: "Link", value: data.open });
   };
 
+  React.useEffect(() => {
+    if (!open) {
+      if (overflowing) {
+        ctxTarget?.focus();
+      } else {
+        toolbarItemRef.current?.focus();
+      }
+    }
+  }, [open, toolbarItemRef]); // explicitly missing dependencies to only focus when popover is open/closed
+
   const target = overflowing ? ctxTarget : undefined;
 
   // Can use manual target and not wrap the toolbar item at all
@@ -51,12 +64,18 @@ export const LinkOverflowItem: React.FC = () => {
       open={open}
       onOpenChange={onOpenChange}
       positioning={{ target, popperRef }}
+      trapFocus
     >
       <PopoverTrigger>
-        <OverflowToolbarItem id="Link" icon={<LinkIcon />} />
+        <OverflowToolbarItem
+          ref={toolbarItemRef}
+          id="Link"
+          icon={<LinkIcon />}
+        />
       </PopoverTrigger>
       <PopoverSurface aria-label="Add link">
         Add a link to the editor
+        <Button>Add link</Button>
       </PopoverSurface>
     </Popover>
   );

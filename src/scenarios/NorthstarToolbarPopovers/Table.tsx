@@ -5,7 +5,7 @@ import {
   PopoverSurface,
   PopoverTrigger,
 } from "@fluentui/react-components";
-import { TableIcon, toolbarBehavior } from "@fluentui/react-northstar";
+import { TableIcon } from "@fluentui/react-northstar";
 import * as React from "react";
 import { useIsOverflowItemVisible } from "../../react/useIsOverflowItemVisible";
 import { OverflowMenuItem } from "./OverflowMenuItem";
@@ -40,7 +40,7 @@ export const TableOverflowItem: React.FC = () => {
     if (!open && !isOverflowing) {
       toolbarItemRef.current?.focus();
     }
-  }, [open, toolbarItemRef, isOverflowing]);
+  }, [open, toolbarItemRef]); // explicitly missing dependencies to only focus when popover is open/closed
 
   const onOpenChange: PopoverProps["onOpenChange"] = (e, data) => {
     dispatch({ type: "Table", value: data.open });
