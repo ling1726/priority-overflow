@@ -4,10 +4,8 @@ import App from "./App";
 import { FluentProvider, teamsLightTheme } from "@fluentui/react-components";
 
 ReactDOM.render(
-  <React.StrictMode>
-    <FluentProvider theme={teamsLightTheme}>
-      <App />
-    </FluentProvider>
-  </React.StrictMode>,
+  <FluentProvider theme={teamsLightTheme}>
+    <App />
+  </FluentProvider>,
   document.getElementById("root")
 );
