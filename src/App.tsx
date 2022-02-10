@@ -23,6 +23,7 @@ import NorthstarToolbar from "./scenarios/NorthstarToolbar";
 import NorthstarToolbarDividerGroups from "./scenarios/NorthstarToolbarDividerGroups";
 import Selection from "./scenarios/Selection";
 import NorthstarToolbarPopovers from "./scenarios/NorthstarToolbarPopovers";
+import AdaptiveOverflowItems from "./scenarios/AdaptiveOverflowItems";
 
 const useStyles = makeStyles({
   container: {
@@ -53,6 +54,7 @@ type Scenarios =
   | "northstarDividerGroup"
   | "northstarPopovers"
   | "selection"
+  | "adaptive"
   | "farItems";
 
 function App() {
@@ -115,6 +117,9 @@ function App() {
                 <MenuItemRadio name="scenario" value="northstarPopovers">
                   Northstar toolbar with popovers
                 </MenuItemRadio>
+                <MenuItemRadio name="scenario" value="adaptive">
+                  Adaptive overflow items
+                </MenuItemRadio>
               </MenuList>
             </MenuPopover>
           </Menu>
@@ -130,24 +135,27 @@ function App() {
           </div>
         </div>
 
-        {scenarios.includes("dom") && <DomOrder />}
-        {scenarios.includes("reverse") && <ReverseDomOrder />}
-        {scenarios.includes("priority") && <Priority />}
-        {scenarios.includes("divider") && <Divider />}
-        {scenarios.includes("farItems") && <FarItems />}
-        {scenarios.includes("dividerGroups") && <DividerGroups />}
-        {scenarios.includes("dividerGroupsPriority") && (
-          <DividerGroupsWithPriority />
-        )}
-        {scenarios.includes("minimumVisible") && <MinimumVisible />}
-        {scenarios.includes("northstar") && <NorthstarToolbar />}
-        {scenarios.includes("northstarDividerGroup") && (
-          <NorthstarToolbarDividerGroups />
-        )}
-        {scenarios.includes("selection") && <Selection />}
-        {scenarios.includes("northstarPopovers") && (
-          <NorthstarToolbarPopovers />
-        )}
+        <div style={{ resize: "horizontal", overflow: "auto" }}>
+          {scenarios.includes("dom") && <DomOrder />}
+          {scenarios.includes("reverse") && <ReverseDomOrder />}
+          {scenarios.includes("priority") && <Priority />}
+          {scenarios.includes("divider") && <Divider />}
+          {scenarios.includes("farItems") && <FarItems />}
+          {scenarios.includes("dividerGroups") && <DividerGroups />}
+          {scenarios.includes("dividerGroupsPriority") && (
+            <DividerGroupsWithPriority />
+          )}
+          {scenarios.includes("minimumVisible") && <MinimumVisible />}
+          {scenarios.includes("northstar") && <NorthstarToolbar />}
+          {scenarios.includes("northstarDividerGroup") && (
+            <NorthstarToolbarDividerGroups />
+          )}
+          {scenarios.includes("selection") && <Selection />}
+          {scenarios.includes("northstarPopovers") && (
+            <NorthstarToolbarPopovers />
+          )}
+          {scenarios.includes("adaptive") && <AdaptiveOverflowItems />}
+        </div>
       </div>
     </FluentProvider>
   );

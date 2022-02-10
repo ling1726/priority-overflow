@@ -52,18 +52,16 @@ const getIcon = () => {
 function Example() {
   const itemIds = new Array(20).fill(0).map((_, i) => i + "");
   return (
-    <div style={{ resize: "horizontal", overflow: "auto" }}>
-      <Overflow>
-        <Toolbar>
-          {itemIds.map((id) => {
-            const Icon = getIcon();
+    <Overflow>
+      <Toolbar>
+        {itemIds.map((id) => {
+          const Icon = getIcon();
 
-            return <OverflowToolbarItem id={id} icon={<Icon />} />;
-          })}
-          <OverflowMenu itemIds={itemIds} />
-        </Toolbar>
-      </Overflow>
-    </div>
+          return <OverflowToolbarItem id={id} icon={<Icon />} />;
+        })}
+        <OverflowMenu itemIds={itemIds} />
+      </Toolbar>
+    </Overflow>
   );
 }
 

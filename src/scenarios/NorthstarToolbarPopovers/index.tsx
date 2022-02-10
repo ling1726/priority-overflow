@@ -82,58 +82,52 @@ function Example() {
   );
 
   return (
-    <div style={{ resize: "horizontal", overflow: "auto" }}>
-      <Overflow padding={30} ref={callbackRef}>
-        <ToolbarContext.Provider value={{ ...state, dispatch, eventTarget }}>
-          <Toolbar>
-            <OverflowToolbarItem
-              id="Bold"
-              icon={<BoldIcon />}
-              groupId="style"
-            />
-            <OverflowToolbarItem
-              id="Italic"
-              icon={<ItalicIcon />}
-              groupId="style"
-            />
-            <OverflowToolbarItem
-              id="Underline"
-              icon={<UnderlineIcon />}
-              groupId="style"
-            />
-            <OverflowToolbarDivider groupId="style" />
-            <OverflowToolbarItem
-              id="FontSize"
-              icon={<FontSizeIcon />}
-              groupId="format"
-            />
-            <OverflowToolbarItem
-              id="RemoveFormat"
-              icon={<RemoveFormatIcon />}
-              groupId="format"
-            />
-            <OverflowToolbarDivider groupId="format" />
-            <OverflowToolbarItem
-              id="Outdent"
-              icon={<OutdentIcon />}
-              groupId="indent"
-            />
-            <OverflowToolbarItem
-              id="Indent"
-              icon={<IndentIcon />}
-              groupId="indent"
-            />
-            <OverflowToolbarDivider groupId="indent" />
-            <OverflowToolbarItem id="Quote" icon={<QuoteIcon />} />
-            <LinkOverflowItem />
-            <OverflowToolbarItem id="CodeSnippet" icon={<CodeSnippetIcon />} />
-            <TableOverflowItem />
-            <ParagraphOverflowItem />
-            <OverflowMenu />
-          </Toolbar>
-        </ToolbarContext.Provider>
-      </Overflow>
-    </div>
+    <Overflow padding={30} ref={callbackRef}>
+      <ToolbarContext.Provider value={{ ...state, dispatch, eventTarget }}>
+        <Toolbar>
+          <OverflowToolbarItem id="Bold" icon={<BoldIcon />} groupId="style" />
+          <OverflowToolbarItem
+            id="Italic"
+            icon={<ItalicIcon />}
+            groupId="style"
+          />
+          <OverflowToolbarItem
+            id="Underline"
+            icon={<UnderlineIcon />}
+            groupId="style"
+          />
+          <OverflowToolbarDivider groupId="style" />
+          <OverflowToolbarItem
+            id="FontSize"
+            icon={<FontSizeIcon />}
+            groupId="format"
+          />
+          <OverflowToolbarItem
+            id="RemoveFormat"
+            icon={<RemoveFormatIcon />}
+            groupId="format"
+          />
+          <OverflowToolbarDivider groupId="format" />
+          <OverflowToolbarItem
+            id="Outdent"
+            icon={<OutdentIcon />}
+            groupId="indent"
+          />
+          <OverflowToolbarItem
+            id="Indent"
+            icon={<IndentIcon />}
+            groupId="indent"
+          />
+          <OverflowToolbarDivider groupId="indent" />
+          <OverflowToolbarItem id="Quote" icon={<QuoteIcon />} />
+          <LinkOverflowItem />
+          <OverflowToolbarItem id="CodeSnippet" icon={<CodeSnippetIcon />} />
+          <TableOverflowItem />
+          <ParagraphOverflowItem />
+          <OverflowMenu />
+        </Toolbar>
+      </ToolbarContext.Provider>
+    </Overflow>
   );
 }
 

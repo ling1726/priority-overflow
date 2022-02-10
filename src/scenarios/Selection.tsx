@@ -33,19 +33,17 @@ function App() {
   return (
     <div className={styles.container}>
       <h2>Selection - selected item is always visible</h2>
-      <div style={{ resize: "horizontal", overflow: "auto" }}>
-        <Overflow>
-          {itemIds.map((_, i) => (
-            <OverflowSelectionItem
-              onSelect={onSelect}
-              key={i}
-              id={i}
-              selected={selected === i}
-            />
-          ))}
-          <OverflowMenu itemIds={itemIds} onSelect={onSelect} />
-        </Overflow>
-      </div>
+      <Overflow>
+        {itemIds.map((_, i) => (
+          <OverflowSelectionItem
+            onSelect={onSelect}
+            key={i}
+            id={i}
+            selected={selected === i}
+          />
+        ))}
+        <OverflowMenu itemIds={itemIds} onSelect={onSelect} />
+      </Overflow>
     </div>
   );
 }
