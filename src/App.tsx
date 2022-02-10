@@ -34,6 +34,14 @@ const useStyles = makeStyles({
     minWidth: "200px",
   },
 
+  resizer: {
+    overflow: "auto",
+    resize: "horizontal",
+    "&::-webkit-resizer": {
+      backgroundImage: "url(http://i.imgur.com/hQZDwHs.png)",
+    },
+  },
+
   config: {
     display: "flex",
     gap: "10px",
@@ -135,7 +143,7 @@ function App() {
           </div>
         </div>
 
-        <div style={{ resize: "horizontal", overflow: "auto" }}>
+        <div className={styles.resizer}>
           {scenarios.includes("dom") && <DomOrder />}
           {scenarios.includes("reverse") && <ReverseDomOrder />}
           {scenarios.includes("priority") && <Priority />}
