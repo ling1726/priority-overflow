@@ -171,7 +171,6 @@ export class OverflowManager {
     this.visibleItemQueue.remove(itemId);
     this.invisibleItemQueue.remove(itemId);
 
-    item.element.style.display = "";
     item.element.removeAttribute(OVERFLOW_ITEM_INVISIBLE);
 
     if (item.groupId) {
@@ -305,7 +304,6 @@ export class OverflowManager {
 
     const item = this.overflowItems[nextVisible];
     // Possible extension to allow consumer to do their own hiding logic
-    item.element.style.display = ""; // TODO remove this and apply through css in scenarios
     item.element.removeAttribute(OVERFLOW_ITEM_INVISIBLE);
     if (item.groupId) {
       this.overflowGroups[item.groupId].invisibleItemIds.delete(item.id);
@@ -321,7 +319,6 @@ export class OverflowManager {
 
     const item = this.overflowItems[nextInvisible];
     const width = this.getOffsetSize(item.element);
-    item.element.style.display = "none"; // TODO remove this and apply through css in scenarios
     item.element.setAttribute(OVERFLOW_ITEM_INVISIBLE, "");
     if (item.groupId) {
       this.overflowGroups[item.groupId].visibleItemIds.delete(item.id);

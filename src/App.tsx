@@ -24,10 +24,14 @@ import NorthstarToolbarDividerGroups from "./scenarios/NorthstarToolbarDividerGr
 import Selection from "./scenarios/Selection";
 import NorthstarToolbarPopovers from "./scenarios/NorthstarToolbarPopovers";
 import AdaptiveOverflowItems from "./scenarios/AdaptiveOverflowItems";
+import { OVERFLOW_ITEM_INVISIBLE } from "./native/overflowManager";
 
 const useStyles = makeStyles({
   container: {
     textAlign: "center",
+    [`& [${OVERFLOW_ITEM_INVISIBLE}]`]: {
+      display: "none",
+    },
   },
 
   menu: {
