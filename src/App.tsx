@@ -40,6 +40,8 @@ const useStyles = makeStyles({
 
   resizer: {
     overflow: "auto",
+    padding: "4px",
+    border: "1px solid",
     resize: "horizontal",
     "&::-webkit-resizer": {
       backgroundImage: "url(http://i.imgur.com/hQZDwHs.png)",
