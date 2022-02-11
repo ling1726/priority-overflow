@@ -41,6 +41,7 @@ const useStyles = makeStyles({
   resizer: {
     overflow: "auto",
     padding: "4px",
+    width: "80%",
     border: "1px solid",
     resize: "horizontal",
     "&::-webkit-resizer": {
