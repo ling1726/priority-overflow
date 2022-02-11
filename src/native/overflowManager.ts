@@ -214,12 +214,7 @@ export class OverflowManager {
         return;
       }
 
-      const dimension =
-        this.overflowAxis === "horizontal" ? "inlineSize" : "blockSize";
-
-      const availableSize =
-        entries[0].contentBoxSize[0][dimension] - this.padding;
-      this.processOverflowItems(availableSize);
+      this.updateOverflow();
     });
   }
 

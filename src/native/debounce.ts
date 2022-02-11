@@ -1,15 +1,18 @@
-export default function debounce<T>(fn: Function): () => Promise<T> {
-  let pending: undefined | Promise<T>;
+/**
+ * Microtask debouncer
+ * https://developer.mozilla.org/en-US/docs/Web/API/HTML_DOM_API/Microtask_guide
+ * @param fn - Function to debounce
+ * @returns debounced function
+ */
+export default function debounce(fn: Function) {
+  let pending: boolean;
   return () => {
     if (!pending) {
-      pending = new Promise<T>((resolve) => {
-        Promise.resolve().then(() => {
-          pending = undefined;
-          resolve(fn());
-        });
+      pending = true;
+      queueMicrotask(() => {
+        fn();
+        pending = false;
       });
     }
-
-    return pending;
   };
 }
