@@ -92,7 +92,8 @@ export const Overflow = React.forwardRef<HTMLDivElement, OverflowProps>(
           className={mergeClasses(
             styles.container,
             props.className,
-            props.overflowAxis === "vertical" && styles.vertical
+            props.overflowAxis === "vertical" && styles.vertical,
+            "overflow-container"
           )}
         >
           {props.children}
