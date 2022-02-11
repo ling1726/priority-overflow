@@ -23,7 +23,6 @@ import NorthstarToolbar from "./scenarios/NorthstarToolbar";
 import NorthstarToolbarDividerGroups from "./scenarios/NorthstarToolbarDividerGroups";
 import Selection from "./scenarios/Selection";
 import NorthstarToolbarPopovers from "./scenarios/NorthstarToolbarPopovers";
-import AdaptiveOverflowItems from "./scenarios/AdaptiveOverflowItems";
 import { OVERFLOW_ITEM_INVISIBLE } from "./native/overflowManager";
 
 const useStyles = makeStyles({
@@ -132,9 +131,6 @@ function App() {
                 <MenuItemRadio name="scenario" value="northstarPopovers">
                   Northstar toolbar with popovers
                 </MenuItemRadio>
-                <MenuItemRadio name="scenario" value="adaptive">
-                  Adaptive overflow items
-                </MenuItemRadio>
               </MenuList>
             </MenuPopover>
           </Menu>
@@ -169,7 +165,6 @@ function App() {
           {scenarios.includes("northstarPopovers") && (
             <NorthstarToolbarPopovers />
           )}
-          {scenarios.includes("adaptive") && <AdaptiveOverflowItems />}
         </div>
       </div>
     </FluentProvider>
