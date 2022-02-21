@@ -10,8 +10,10 @@ export default function debounce(fn: Function) {
     if (!pending) {
       pending = true;
       queueMicrotask(() => {
-        fn();
+        // Need to set pending to `false` before the debounced function is run.
+        // React can actually interrupt the function while it's running!
         pending = false;
+        fn();
       });
     }
   };
