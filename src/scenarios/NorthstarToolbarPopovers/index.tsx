@@ -4,8 +4,8 @@ import {
   teamsTheme,
   Toolbar,
   ToolbarItem,
-  PopperRefHandle,
 } from "@fluentui/react-northstar";
+import { PopperRefHandle } from "@fluentui/react-positioning";
 import {
   BoldIcon,
   ItalicIcon,
@@ -137,7 +137,10 @@ export const OverflowMenu: React.FC = () => {
   const open = useToolbarContext((v) => v.overflowMenu);
   const target = useToolbarContext((v) => v.target);
   const eventTarget = useToolbarContext((v) => v.eventTarget);
-  const popperRef = React.useRef<PopperRefHandle | null>(null);
+  const popperRef = React.useRef<PopperRefHandle>({
+    updatePosition: () => null,
+    setTarget: () => null,
+  });
 
   // Popper can handle window resize, but if the overflow is not a result of window resize the popovers will not
   // update their positions to follow their targets

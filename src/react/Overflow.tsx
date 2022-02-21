@@ -1,5 +1,9 @@
 import React from "react";
-import { makeStyles, mergeClasses } from "@fluentui/react-components";
+import {
+  makeStyles,
+  mergeClasses,
+  shorthands,
+} from "@fluentui/react-components";
 import { useOverflowContainer } from "./useOverflowContainer";
 import { OverflowContext } from "./overflowContext";
 import {
@@ -15,7 +19,7 @@ const useStyles = makeStyles({
     display: "flex",
     flexWrap: "nowrap",
     minWidth: 0,
-    overflow: "hidden",
+    ...shorthands.overflow("hidden"),
   },
 
   vertical: {

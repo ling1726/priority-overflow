@@ -1,6 +1,7 @@
 import React from "react";
 import {
   ObserveOptions,
+  OnUpdateItemVisibility,
   OnUpdateOverflow,
   OverflowItemEntry,
   OverflowManager,
@@ -13,7 +14,13 @@ export const useOverflowContainer = (
   update: OnUpdateOverflow,
   options: useOverflowContainerOptions = {}
 ) => {
-  const { overflowAxis, overflowDirection, padding, minimumVisible } = options;
+  const {
+    overflowAxis,
+    overflowDirection,
+    padding,
+    minimumVisible,
+    onUpdateItemVisibility,
+  } = options;
   // DOM ref to the overflow container element
   const containerRef = React.useRef<HTMLDivElement>(null);
   const updateOverflowItems = useEventCallback(update);
@@ -31,6 +38,8 @@ export const useOverflowContainer = (
       overflowAxis,
       padding,
       minimumVisible,
+      onUpdateItemVisibility:
+        onUpdateItemVisibility ?? defaultUpdateVisibilityCallback,
     });
 
     return () => {
@@ -43,6 +52,7 @@ export const useOverflowContainer = (
     overflowAxis,
     padding,
     minimumVisible,
+    onUpdateItemVisibility,
   ]);
 
   const registerItem = React.useCallback(
@@ -55,7 +65,7 @@ export const useOverflowContainer = (
   );
 
   const updateOverflow = React.useCallback(() => {
-    overflowManager.updateOverflow();
+    overflowManager.forceUpdate();
   }, [overflowManager]);
 
   return {
@@ -63,4 +73,15 @@ export const useOverflowContainer = (
     registerItem,
     updateOverflow,
   };
+};
+
+const defaultUpdateVisibilityCallback: OnUpdateItemVisibility = ({
+  item,
+  visible,
+}) => {
+  if (visible) {
+    item.element.style.removeProperty("display");
+  } else {
+    item.element.style.setProperty("display", "none");
+  }
 };

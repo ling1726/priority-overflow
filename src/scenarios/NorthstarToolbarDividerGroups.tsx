@@ -41,16 +41,6 @@ export default function App() {
   );
 }
 
-const iconSet = [
-  BoldIcon,
-  ItalicIcon,
-  UnderlineIcon,
-  FontSizeIcon,
-  RemoveFormatIcon,
-  OutdentIcon,
-  IndentIcon,
-];
-
 function Example() {
   return (
     <div style={{ resize: "horizontal", overflow: "auto" }}>

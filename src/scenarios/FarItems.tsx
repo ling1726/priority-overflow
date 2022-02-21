@@ -1,5 +1,5 @@
 import React from "react";
-import { Button, makeStyles } from "@fluentui/react-components";
+import { Button, makeStyles, shorthands } from "@fluentui/react-components";
 import { Overflow } from "../react/Overflow";
 import { TestOverflowItem } from "../utils/TestOverflowItem";
 import { OverflowMenu } from "../utils/OverflowMenu";
@@ -20,7 +20,7 @@ const useStyles = makeStyles({
 
   farItems: {
     dislay: "flex",
-    gap: "4px",
+    ...shorthands.gap("4px"),
     flexWrap: "nowrap",
   },
 });

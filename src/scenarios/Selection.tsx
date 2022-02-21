@@ -56,7 +56,7 @@ const useItemStyles = makeStyles({
   },
 
   selected: {
-    background: "#ffd1a3",
+    backgroundColor: "#ffd1a3",
   },
 });
 

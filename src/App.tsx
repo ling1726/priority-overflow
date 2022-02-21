@@ -10,6 +10,7 @@ import {
   MenuProps,
   FluentProvider,
   teamsLightTheme,
+  shorthands,
 } from "@fluentui/react-components";
 import DomOrder from "./scenarios/DomOrderOverflow";
 import Priority from "./scenarios/PriorityOverflow";
@@ -23,14 +24,10 @@ import NorthstarToolbar from "./scenarios/NorthstarToolbar";
 import NorthstarToolbarDividerGroups from "./scenarios/NorthstarToolbarDividerGroups";
 import Selection from "./scenarios/Selection";
 import NorthstarToolbarPopovers from "./scenarios/NorthstarToolbarPopovers";
-import { OVERFLOW_ITEM_INVISIBLE } from "./native/overflowManager";
 
 const useStyles = makeStyles({
   container: {
     textAlign: "center",
-    [`& [${OVERFLOW_ITEM_INVISIBLE}]`]: {
-      display: "none",
-    },
   },
 
   menu: {
@@ -39,9 +36,9 @@ const useStyles = makeStyles({
 
   resizer: {
     "& .overflow-container": {
-      padding: "4px",
+      ...shorthands.padding("4px"),
       width: "80%",
-      border: "1px solid",
+      ...shorthands.border("1px", "solid"),
       resize: "horizontal",
       "&::-webkit-resizer": {
         backgroundImage: "url(http://i.imgur.com/hQZDwHs.png)",
@@ -51,7 +48,7 @@ const useStyles = makeStyles({
 
   config: {
     display: "flex",
-    gap: "10px",
+    ...shorthands.gap("10px"),
     alignItems: "center",
     marginBottom: "50px",
   },
@@ -74,13 +71,24 @@ type Scenarios =
 
 function App() {
   const styles = useStyles();
-  const [scenarios, setScenarios] = React.useState<Scenarios[]>([
-    "northstarPopovers",
-  ]);
+  const [scenarios, setScenarios] = React.useState<Scenarios[]>(["dom"]);
+  const [useResizer, setUseResizer] = React.useState<boolean>(true);
   const onCheckedChange: MenuProps["onCheckedValueChange"] = (e, data) => {
     setScenarios(data.checkedItems as Scenarios[]);
   };
   const [rtl, setRtl] = React.useState(false);
+
+  React.useEffect(() => {
+    // css resize actually sets explicit width/height
+    if (!useResizer) {
+      const overflowContainerEl: HTMLElement | null = document.querySelector(
+        ".overflow-container"
+      );
+      if (overflowContainerEl) {
+        overflowContainerEl.style.width = "";
+      }
+    }
+  }, [useResizer]);
 
   return (
     <FluentProvider dir={rtl ? "rtl" : "ltr"} theme={teamsLightTheme}>
@@ -145,9 +153,19 @@ function App() {
               checked={rtl}
             />
           </div>
+          <div>
+            <label htmlFor="rtl">Drag resize ?</label>
+            <input
+              id="rtl"
+              onChange={(e) => setUseResizer((s) => !s)}
+              type="checkbox"
+              name="rtl"
+              checked={useResizer}
+            />
+          </div>
         </div>
 
-        <div className={styles.resizer}>
+        <div className={useResizer ? styles.resizer : ""}>
           {scenarios.includes("dom") && <DomOrder />}
           {scenarios.includes("reverse") && <ReverseDomOrder />}
           {scenarios.includes("priority") && <Priority />}

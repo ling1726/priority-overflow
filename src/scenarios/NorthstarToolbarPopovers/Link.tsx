@@ -6,9 +6,10 @@ import {
   PopoverSurface,
   PopoverTrigger,
 } from "@fluentui/react-components";
+import { PopperRefHandle } from "@fluentui/react-positioning";
 import { useToolbarContext } from "./state";
 import { useIsOverflowItemVisible } from "../../react/useIsOverflowItemVisible";
-import { LinkIcon, PopperRefHandle } from "@fluentui/react-northstar";
+import { LinkIcon } from "@fluentui/react-northstar";
 import { OverflowToolbarItem } from "./OverflowToolbarItem";
 import { OverflowMenuItem } from "./OverflowMenuItem";
 
@@ -24,7 +25,10 @@ export const LinkOverflowItem: React.FC = () => {
   const ctxTarget = useToolbarContext((v) => v.target);
   const overflowing = !useIsOverflowItemVisible("Link");
   const eventTarget = useToolbarContext((v) => v.eventTarget);
-  const popperRef = React.useRef<PopperRefHandle | null>(null);
+  const popperRef = React.useRef<PopperRefHandle>({
+    updatePosition: () => null,
+    setTarget: () => null,
+  });
   // Popper should follow target on container resize
   React.useEffect(() => {
     const listener = (e: CustomEvent) => {
@@ -51,7 +55,9 @@ export const LinkOverflowItem: React.FC = () => {
         toolbarItemRef.current?.focus();
       }
     }
-  }, [open, toolbarItemRef]); // explicitly missing dependencies to only focus when popover is open/closed
+    // explicitly missing dependencies to only focus when popover is open/closed
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, toolbarItemRef]);
 
   const target = overflowing ? ctxTarget : undefined;
 

@@ -40,7 +40,9 @@ export const TableOverflowItem: React.FC = () => {
     if (!open && !isOverflowing) {
       toolbarItemRef.current?.focus();
     }
-  }, [open, toolbarItemRef]); // explicitly missing dependencies to only focus when popover is open/closed
+    // explicitly missing dependencies to only focus when popover is open/closed
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, toolbarItemRef]);
 
   const onOpenChange: PopoverProps["onOpenChange"] = (e, data) => {
     dispatch({ type: "Table", value: data.open });

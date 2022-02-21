@@ -4,11 +4,6 @@ import { PriorityQueue } from "./priorityQueue";
 export type OverflowDirection = "start" | "end";
 export type OverflowAxis = "horizontal" | "vertical";
 export type OverflowGroupState = "visible" | "hidden" | "overflow";
-/** Indicates that this item can be overflowed */
-export const OVERFLOW_ITEM_DATA = "data-overflow-item";
-export const OVERFLOW_ITEM_INVISIBLE = "data-overflow-invisible";
-/** Indicates that this element is only visible when there is overflow */
-export const OVERFLOW_ONLY_ITEM = "data-overflow-only";
 export interface OverflowItemEntry {
   /**
    * HTML element that will be disappear when overflowed
@@ -32,6 +27,10 @@ export interface OverflowItemEntry {
  */
 export type OnUpdateOverflow = (data: OverflowEventPayload) => void;
 
+export type OnUpdateItemVisibility = (
+  data: OnUpdateItemVisibilityPayload
+) => void;
+
 /**
  * Payload of the custom DOM event for overflow updates
  */
@@ -39,6 +38,11 @@ export interface OverflowEventPayload {
   visibleItems: OverflowItemEntry[];
   invisibleItems: OverflowItemEntry[];
   groupVisibility: Record<string, OverflowGroupState>;
+}
+
+export interface OnUpdateItemVisibilityPayload {
+  item: OverflowItemEntry;
+  visible: boolean;
 }
 
 export interface ObserveOptions {
@@ -65,9 +69,17 @@ export interface ObserveOptions {
    * The minimum number of visible items
    */
   minimumVisible?: number;
+
+  /**
+   * Callback when item visibility is updated
+   */
+  onUpdateItemVisibility?: OnUpdateItemVisibility;
 }
 
 export class OverflowManager {
+  private onUpdateItemVisiblity: NonNullable<
+    ObserveOptions["onUpdateItemVisibility"]
+  > = () => null;
   /**
    * Called each time the item visibility is updated due to overflow
    */
@@ -116,15 +128,21 @@ export class OverflowManager {
    * Start observing container size and child elements and manages overflow item visiblity
    */
   public observe(container: HTMLElement, options: ObserveOptions = {}) {
-    const { padding, overflowAxis, overflowDirection, minimumVisible } =
-      options;
+    const {
+      padding,
+      overflowAxis,
+      overflowDirection,
+      minimumVisible,
+      onUpdateItemVisibility,
+    } = options;
+
     this.container = container;
     this.padding = padding ?? this.padding;
     this.minimumVisible = minimumVisible ?? this.minimumVisible;
     this.overflowDirection = overflowDirection ?? this.overflowDirection;
     this.overflowAxis = overflowAxis ?? this.overflowAxis;
-
-    this.dispatchOverflowUpdate();
+    this.onUpdateItemVisiblity =
+      onUpdateItemVisibility ?? this.onUpdateItemVisiblity;
     this.resizeObserver.observe(this.container);
   }
 
@@ -141,7 +159,6 @@ export class OverflowManager {
    */
   public addItems(...items: OverflowItemEntry[]) {
     items.forEach((item) => {
-      item.element.setAttribute(OVERFLOW_ITEM_DATA, item.id);
       this.overflowItems[item.id] = item;
       this.visibleItemQueue.enqueue(item.id);
 
@@ -167,11 +184,8 @@ export class OverflowManager {
    */
   public removeItem(itemId: string) {
     const item = this.overflowItems[itemId];
-    item.element.removeAttribute(OVERFLOW_ITEM_DATA);
     this.visibleItemQueue.remove(itemId);
     this.invisibleItemQueue.remove(itemId);
-
-    item.element.removeAttribute(OVERFLOW_ITEM_INVISIBLE);
 
     if (item.groupId) {
       this.overflowGroups[item.groupId].visibleItemIds.delete(item.id);
@@ -187,13 +201,7 @@ export class OverflowManager {
    * Useful when new elements are inserted into the container after the overflow update
    * i.e. extra dividers or menus
    */
-  public updateOverflow = debounce(
-    () =>
-      new Promise<void>((resolve) => {
-        this.forceUpdate();
-        resolve();
-      })
-  );
+  public updateOverflow = debounce(() => this.forceUpdate());
 
   /**
    * Manually runs the overflow calculation sync
@@ -203,9 +211,8 @@ export class OverflowManager {
       return;
     }
 
-    this.processOverflowItems(
-      this.getOffsetSize(this.container) - this.padding
-    );
+    const availableSize = this.getOffsetSize(this.container) - this.padding;
+    this.processOverflowItems(availableSize);
   };
 
   private initResizeObserver() {
@@ -233,55 +240,22 @@ export class OverflowManager {
     const visibleTop = this.visibleItemQueue.peek();
     const invisibleTop = this.invisibleItemQueue.peek();
 
-    const children = this.container.querySelectorAll(`[${OVERFLOW_ITEM_DATA}]`);
-    let currentWidth = 0;
-    for (let i = 0; i < children.length; i++) {
-      const child = children[i];
-      if (
-        child instanceof HTMLElement &&
-        !child.hasAttribute(OVERFLOW_ITEM_INVISIBLE)
-      ) {
-        currentWidth += this.getOffsetSize(child);
-      }
-    }
-
-    const overflowOnlyItems = document.querySelectorAll(
-      `[${OVERFLOW_ONLY_ITEM}]`
-    );
-    for (let i = 0; i < overflowOnlyItems.length; i++) {
-      const overflowOnlyItem = overflowOnlyItems[i];
-      if (overflowOnlyItem instanceof HTMLElement) {
-        currentWidth += this.getOffsetSize(overflowOnlyItem);
-      }
-    }
+    const visibleItemIds = this.visibleItemQueue.all();
+    let currentWidth = visibleItemIds.reduce((sum, visibleItemId) => {
+      const child = this.overflowItems[visibleItemId].element;
+      return sum + this.getOffsetSize(child);
+    }, 0);
 
     // Add items until available width is filled
     while (currentWidth < availableSize && this.invisibleItemQueue.size > 0) {
       currentWidth += this.makeItemVisible();
     }
-
     // Remove items until there's no more overlap
     while (currentWidth > availableSize && this.visibleItemQueue.size > 0) {
       if (this.visibleItemQueue.size === this.minimumVisible) {
         break;
       }
       currentWidth -= this.makeItemInvisible();
-    }
-
-    // Make sure that any overflow only items (i.e. dropdown menus) can actually be removed
-    if (this.invisibleItemQueue.size === 1) {
-      for (let i = 0; i < overflowOnlyItems.length; i++) {
-        const overflowOnlyItem = overflowOnlyItems[i];
-        if (overflowOnlyItem instanceof HTMLElement) {
-          currentWidth -= this.getOffsetSize(overflowOnlyItem);
-        }
-      }
-
-      currentWidth += this.makeItemVisible();
-
-      if (currentWidth > availableSize) {
-        this.makeItemInvisible();
-      }
     }
 
     // only update when the state of visible/invisible items has changed
@@ -298,8 +272,7 @@ export class OverflowManager {
     this.visibleItemQueue.enqueue(nextVisible);
 
     const item = this.overflowItems[nextVisible];
-    // Possible extension to allow consumer to do their own hiding logic
-    item.element.removeAttribute(OVERFLOW_ITEM_INVISIBLE);
+    this.onUpdateItemVisiblity({ item, visible: true });
     if (item.groupId) {
       this.overflowGroups[item.groupId].invisibleItemIds.delete(item.id);
       this.overflowGroups[item.groupId].visibleItemIds.add(item.id);
@@ -314,7 +287,7 @@ export class OverflowManager {
 
     const item = this.overflowItems[nextInvisible];
     const width = this.getOffsetSize(item.element);
-    item.element.setAttribute(OVERFLOW_ITEM_INVISIBLE, "");
+    this.onUpdateItemVisiblity({ item, visible: false });
     if (item.groupId) {
       this.overflowGroups[item.groupId].visibleItemIds.delete(item.id);
       this.overflowGroups[item.groupId].invisibleItemIds.add(item.id);
