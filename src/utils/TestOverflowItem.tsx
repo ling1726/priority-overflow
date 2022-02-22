@@ -1,28 +1,21 @@
 import { Button, makeStyles } from "@fluentui/react-components";
 import * as React from "react";
-import { useOverflowItem } from "../react/useOverflowItem";
+import { OverflowItem } from "../react/OverflowItem";
 
 const useStyles = makeStyles({
-  container: {
-    display: "flex",
-    paddingLeft: "2px",
-    paddingRight: "2px",
+  button: {
+    marginLeft: "2px",
+    marginRight: "2px",
   },
 });
 
 export const TestOverflowItem: React.FC<TestOverflowItemProps> = (props) => {
-  const ref = useOverflowItem<HTMLDivElement>(
-    props.id,
-    props.priority,
-    props.groupId
-  );
   const styles = useStyles();
 
   return (
-    <div ref={ref} className={styles.container}>
-      <Button>Item {props.id}</Button>
-      {props.children}
-    </div>
+    <OverflowItem id={props.id} priority={props.priority} groupId={props.groupId}>
+      <Button className={styles.button}>Item {props.id}</Button>
+    </OverflowItem>
   );
 };
 
