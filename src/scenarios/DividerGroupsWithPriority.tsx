@@ -9,7 +9,7 @@ import {
   MenuTrigger,
 } from "@fluentui/react-components";
 import { TestOverflowItem } from "../utils/TestOverflowItem";
-import { Overflow } from "../react/Overflow";
+import { TestOverflow } from "../utils/TestOverflow";
 import { useIsOverflowGroupVisible } from "../react/useIsOverflowGroupVisible";
 import { useOverflowMenu } from "../react/useOverflowMenu";
 import { TestOverflowMenuItem } from "../utils/TestOverflowMenuItem";
@@ -26,7 +26,7 @@ function App() {
   return (
     <div className={styles.container}>
       <h2>Rendering dividers with groups with priority</h2>
-      <Overflow overflowDirection="start" padding={30}>
+      <TestOverflow overflowDirection="start" padding={30}>
         <TestOverflowItem id={6} priority={6} groupId={1} />
         <TestOverflowGroupDivider groupId={1} />
         <TestOverflowItem id={7} priority={7} groupId={2} />
@@ -55,7 +55,7 @@ function App() {
             8,
           ]}
         />
-      </Overflow>
+      </TestOverflow>
     </div>
   );
 }

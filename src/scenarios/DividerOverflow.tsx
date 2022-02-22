@@ -1,7 +1,7 @@
 import React from "react";
 import { makeStyles } from "@fluentui/react-components";
 import { TestOverflowItem } from "../utils/TestOverflowItem";
-import { Overflow } from "../react/Overflow";
+import { TestOverflow } from "../utils/TestOverflow";
 import { TestOverflowDivider } from "../utils/TestOverflowDivider";
 import { OverflowMenu } from "../utils/OverflowMenu";
 
@@ -17,7 +17,7 @@ function App() {
   return (
     <div className={styles.container}>
       <h2>Rendering dividers</h2>
-      <Overflow overflowDirection="end">
+      <TestOverflow overflowDirection="end">
         <TestOverflowItem id={1} />
         <TestOverflowDivider id={`divider-1`} />
         <TestOverflowItem id={2} />
@@ -46,7 +46,7 @@ function App() {
             8,
           ]}
         />
-      </Overflow>
+      </TestOverflow>
     </div>
   );
 }

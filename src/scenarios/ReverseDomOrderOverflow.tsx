@@ -1,6 +1,6 @@
 import React from "react";
 import { makeStyles } from "@fluentui/react-components";
-import { Overflow } from "../react/Overflow";
+import { TestOverflow } from "../utils/TestOverflow";
 import { TestOverflowItem } from "../utils/TestOverflowItem";
 import { OverflowMenu } from "../utils/OverflowMenu";
 
@@ -17,12 +17,12 @@ function App() {
   return (
     <div className={styles.container}>
       <h2>Reverse DOM order overflow</h2>
-      <Overflow overflowDirection="start">
+      <TestOverflow overflowDirection="start">
         <OverflowMenu itemIds={itemIds} />
         {itemIds.map((_, i) => (
           <TestOverflowItem key={i} id={i} />
         ))}
-      </Overflow>
+      </TestOverflow>
     </div>
   );
 }

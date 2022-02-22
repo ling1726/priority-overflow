@@ -1,6 +1,6 @@
 import React from "react";
 import { Button, makeStyles, shorthands } from "@fluentui/react-components";
-import { Overflow } from "../react/Overflow";
+import { TestOverflow } from "../utils/TestOverflow";
 import { TestOverflowItem } from "../utils/TestOverflowItem";
 import { OverflowMenu } from "../utils/OverflowMenu";
 
@@ -33,12 +33,12 @@ function App() {
     <div className={styles.container}>
       <h2>Far items</h2>
       <div className={styles.exampleContainer}>
-        <Overflow className={styles.overflowContainer}>
+        <TestOverflow className={styles.overflowContainer}>
           {itemIds.map((_, i) => (
             <TestOverflowItem key={i} id={i} />
           ))}
           <OverflowMenu itemIds={itemIds} />
-        </Overflow>
+        </TestOverflow>
 
         <div className={styles.farItems}>
           <Button>Foo</Button>

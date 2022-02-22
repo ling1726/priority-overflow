@@ -25,7 +25,7 @@ import {
   MenuProps,
   MenuTrigger,
 } from "@fluentui/react-components";
-import { Overflow } from "../../react/Overflow";
+import { TestOverflow } from "../../utils/TestOverflow";
 import { useOverflowMenu } from "../../react/useOverflowMenu";
 import { useMergedRefs } from "@fluentui/react-utilities";
 import {
@@ -82,7 +82,7 @@ function Example() {
   );
 
   return (
-    <Overflow padding={30} ref={callbackRef}>
+    <TestOverflow padding={30} ref={callbackRef}>
       <ToolbarContext.Provider value={{ ...state, dispatch, eventTarget }}>
         <Toolbar>
           <OverflowToolbarItem id="Bold" icon={<BoldIcon />} groupId="style" />
@@ -127,7 +127,7 @@ function Example() {
           <OverflowMenu />
         </Toolbar>
       </ToolbarContext.Provider>
-    </Overflow>
+    </TestOverflow>
   );
 }
 

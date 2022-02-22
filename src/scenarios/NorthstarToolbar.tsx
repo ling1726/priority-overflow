@@ -22,7 +22,7 @@ import {
   MenuPopover,
   MenuTrigger,
 } from "@fluentui/react-components";
-import { Overflow } from "../react/Overflow";
+import { TestOverflow } from "../utils/TestOverflow";
 import { useOverflowItem } from "../react/useOverflowItem";
 import { useIsOverflowItemVisible } from "../react/useIsOverflowItemVisible";
 import { useOverflowMenu } from "../react/useOverflowMenu";
@@ -52,7 +52,7 @@ const getIcon = () => {
 function Example() {
   const itemIds = new Array(20).fill(0).map((_, i) => i + "");
   return (
-    <Overflow>
+    <TestOverflow>
       <Toolbar>
         {itemIds.map((id) => {
           const Icon = getIcon();
@@ -61,7 +61,7 @@ function Example() {
         })}
         <OverflowMenu itemIds={itemIds} />
       </Toolbar>
-    </Overflow>
+    </TestOverflow>
   );
 }
 

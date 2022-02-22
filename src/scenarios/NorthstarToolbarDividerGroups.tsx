@@ -27,7 +27,7 @@ import {
   MenuPopover,
   MenuTrigger,
 } from "@fluentui/react-components";
-import { Overflow } from "../react/Overflow";
+import { TestOverflow } from "../utils/TestOverflow";
 import { useOverflowItem } from "../react/useOverflowItem";
 import { useIsOverflowItemVisible } from "../react/useIsOverflowItemVisible";
 import { useOverflowMenu } from "../react/useOverflowMenu";
@@ -44,7 +44,7 @@ export default function App() {
 function Example() {
   return (
     <div style={{ resize: "horizontal", overflow: "auto" }}>
-      <Overflow overflowDirection="start" padding={30}>
+      <TestOverflow overflowDirection="start" padding={30}>
         <Toolbar>
           <OverflowToolbarItem id="Bold" icon={<BoldIcon />} groupId="style" />
           <OverflowToolbarItem
@@ -85,7 +85,7 @@ function Example() {
           <OverflowToolbarItem id="CodeSnippet" icon={<CodeSnippetIcon />} />
           <OverflowMenu />
         </Toolbar>
-      </Overflow>
+      </TestOverflow>
     </div>
   );
 }

@@ -9,7 +9,7 @@ import {
   MenuTrigger,
   mergeClasses,
 } from "@fluentui/react-components";
-import { Overflow } from "../react/Overflow";
+import { TestOverflow } from "../utils/TestOverflow";
 import { useOverflowItem } from "../react/useOverflowItem";
 import { useIsOverflowItemVisible } from "../react/useIsOverflowItemVisible";
 import { useOverflowMenu } from "../react/useOverflowMenu";
@@ -33,7 +33,7 @@ function App() {
   return (
     <div className={styles.container}>
       <h2>Selection - selected item is always visible</h2>
-      <Overflow>
+      <TestOverflow>
         {itemIds.map((_, i) => (
           <OverflowSelectionItem
             onSelect={onSelect}
@@ -43,7 +43,7 @@ function App() {
           />
         ))}
         <OverflowMenu itemIds={itemIds} onSelect={onSelect} />
-      </Overflow>
+      </TestOverflow>
     </div>
   );
 }
