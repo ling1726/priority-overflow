@@ -184,6 +184,7 @@ export class OverflowManager {
    */
   public removeItem(itemId: string) {
     const item = this.overflowItems[itemId];
+    this.onUpdateItemVisiblity({ visible: true, item });
     this.visibleItemQueue.remove(itemId);
     this.invisibleItemQueue.remove(itemId);
 

@@ -65,7 +65,7 @@ export const useOverflowContainer = (
   );
 
   const updateOverflow = React.useCallback(() => {
-    overflowManager.forceUpdate();
+    overflowManager.updateOverflow();
   }, [overflowManager]);
 
   return {
