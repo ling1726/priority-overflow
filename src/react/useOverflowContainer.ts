@@ -59,7 +59,10 @@ export const useOverflowContainer = (
     (item: OverflowItemEntry) => {
       overflowManager.addItems(item);
 
-      return () => overflowManager.removeItem(item.id);
+      return () => {
+        item.element.style.removeProperty("display");
+        overflowManager.removeItem(item.id);
+      };
     },
     [overflowManager]
   );
