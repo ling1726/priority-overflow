@@ -58,7 +58,7 @@ export const useOverflowContainer = (
 
   const registerItem = React.useCallback(
     (item: OverflowItemEntry) => {
-      overflowManager.addItems(item);
+      overflowManager.addItem(item);
 
       return () => {
         item.element.style.removeProperty("display");

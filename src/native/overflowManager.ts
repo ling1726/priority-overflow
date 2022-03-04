@@ -12,6 +12,9 @@ import {
 
 export * from "./types";
 
+/**
+ * @returns overflow manager instance
+ */
 export function createOverflowManager(): OverflowManager {
   const overflowItems: Record<string, OverflowItemEntry> = {};
   const overflowGroups: Record<
@@ -170,7 +173,7 @@ export function createOverflowManager(): OverflowManager {
     }
   };
 
-  const forceUpdate = () => {
+  const forceUpdate: OverflowManager["forceUpdate"] = () => {
     if (!container) {
       return;
     }
@@ -179,7 +182,7 @@ export function createOverflowManager(): OverflowManager {
     processOverflowItems(availableSize);
   };
 
-  const update = debounce(forceUpdate);
+  const update: OverflowManager["update"] = debounce(forceUpdate);
 
   const observe: OverflowManager["observe"] = (observedContainer, options) => {
     ({
@@ -199,22 +202,20 @@ export function createOverflowManager(): OverflowManager {
     resizeObserver.disconnect();
   };
 
-  const addItems: OverflowManager["addItems"] = (...items) => {
-    items.forEach((item) => {
-      overflowItems[item.id] = item;
-      visibleItemQueue.enqueue(item.id);
+  const addItem: OverflowManager["addItem"] = (item) => {
+    overflowItems[item.id] = item;
+    visibleItemQueue.enqueue(item.id);
 
-      if (item.groupId) {
-        if (!overflowGroups[item.groupId]) {
-          overflowGroups[item.groupId] = {
-            visibleItemIds: new Set<string>(),
-            invisibleItemIds: new Set<string>(),
-          };
-        }
-
-        overflowGroups[item.groupId].visibleItemIds.add(item.id);
+    if (item.groupId) {
+      if (!overflowGroups[item.groupId]) {
+        overflowGroups[item.groupId] = {
+          visibleItemIds: new Set<string>(),
+          invisibleItemIds: new Set<string>(),
+        };
       }
-    });
+
+      overflowGroups[item.groupId].visibleItemIds.add(item.id);
+    }
 
     update();
   };
@@ -234,7 +235,7 @@ export function createOverflowManager(): OverflowManager {
   };
 
   return {
-    addItems,
+    addItem,
     disconnect,
     forceUpdate,
     observe,

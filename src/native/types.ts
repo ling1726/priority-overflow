@@ -81,7 +81,7 @@ export interface ObserveOptions {
 export interface OverflowManager {
   observe: (container: HTMLElement, options: ObserveOptions) => void;
   disconnect: () => void;
-  addItems: (...items: OverflowItemEntry[]) => void;
+  addItem: (item: OverflowItemEntry) => void;
   removeItem: (itemId: string) => void;
   update: () => void;
   forceUpdate: () => void;
