@@ -1,118 +1,125 @@
 export type PriorityQueueCompareFn<T> = (a: T, b: T) => number;
 
+export interface PriorityQueue<T> {
+  all: () => T[];
+  clear: () => void;
+  contains: (item: T) => boolean;
+  dequeue: () => T;
+  enqueue: (item: T) => void;
+  peek: () => T | null;
+  remove: (item: T) => void;
+  size: () => number;
+}
+
 /**
- * Priority queue implemented with a min heap
+ * @param compare - comparison function for items
+ * @returns Priority queue implemented with a min heap
  */
-export class PriorityQueue<T> {
-  public arr: T[] = [];
-  private compare: PriorityQueueCompareFn<T>;
-  public size: number = 0;
+export function createPriorityQueue<T>(
+  compare: PriorityQueueCompareFn<T>
+): PriorityQueue<T> {
+  const arr: T[] = [];
+  let size = 0;
 
-  constructor(compare: PriorityQueueCompareFn<T>) {
-    this.compare = compare;
-    this.arr.sort();
-  }
-
-  private left(i: number) {
+  const left = (i: number) => {
     return 2 * i + 1;
-  }
+  };
 
-  private right(i: number) {
+  const right = (i: number) => {
     return 2 * i + 2;
-  }
+  };
 
-  private parent(i: number) {
+  const parent = (i: number) => {
     return Math.floor((i - 1) / 2);
-  }
+  };
 
-  private swap(i: number, j: number) {
-    const tmp = this.arr[i];
-    this.arr[i] = this.arr[j];
-    this.arr[j] = tmp;
-  }
+  const swap = (a: number, b: number) => {
+    const tmp = arr[a];
+    arr[a] = arr[b];
+    arr[b] = tmp;
+  };
 
-  private heapify(i: number) {
+  const heapify = (i: number) => {
     let smallest = i;
-    const left = this.left(i);
-    const right = this.right(i);
+    const l = left(i);
+    const r = right(i);
 
-    if (
-      left < this.size &&
-      this.compare(this.arr[left], this.arr[smallest]) < 0
-    ) {
-      smallest = left;
+    if (l < size && compare(arr[l], arr[smallest]) < 0) {
+      smallest = l;
     }
 
-    if (
-      right < this.size &&
-      this.compare(this.arr[right], this.arr[smallest]) < 0
-    ) {
-      smallest = right;
+    if (r < size && compare(arr[r], arr[smallest]) < 0) {
+      smallest = r;
     }
 
     if (smallest !== i) {
-      this.swap(smallest, i);
-      this.heapify(smallest);
+      swap(smallest, i);
+      heapify(smallest);
     }
-  }
+  };
 
-  public dequeue(): T {
-    if (this.size === 0) {
-      throw new Error("priority queue is empty");
+  const dequeue = () => {
+    if (size === 0) {
+      throw new Error("Priority queue empty");
     }
 
-    const res = this.arr[0];
-    this.arr[0] = this.arr[this.size - 1];
-    this.size--;
-
-    this.heapify(0);
+    const res = arr[0];
+    arr[0] = arr[--size];
+    heapify(0);
 
     return res;
-  }
+  };
 
-  public peek(): T | null {
-    if (this.size === 0) {
+  const peek = () => {
+    if (size === 0) {
       return null;
     }
 
-    return this.arr[0];
-  }
+    return arr[0];
+  };
 
-  public enqueue(val: T) {
-    this.arr[this.size] = val;
-    this.size++;
-
-    let i = this.size - 1;
-    let parent = this.parent(i);
-
-    while (i > 0 && this.compare(this.arr[parent], this.arr[i]) > 0) {
-      this.swap(parent, i);
-      i = parent;
-      parent = this.parent(i);
+  const enqueue = (item: T) => {
+    arr[size++] = item;
+    let i = size - 1;
+    let p = parent(i);
+    while (i > 0 && compare(arr[p], arr[i]) > 0) {
+      swap(p, i);
+      i = p;
+      p = parent(i);
     }
-  }
+  };
 
-  public contains(val: T) {
-    return this.arr.find((x) => x === val);
-  }
+  const contains = (item: T) => {
+    return arr.indexOf(item) >= 0;
+  };
 
-  public clear() {
-    this.size = 0;
-  }
+  const remove = (item: T) => {
+    const i = arr.indexOf(item);
 
-  public all(): T[] {
-    return this.arr.slice(0, this.size);
-  }
-
-  public remove(val: T) {
-    for (let i = 0; i < this.size; i++) {
-      if (this.arr[i] === val) {
-        this.arr[i] = this.arr[this.size - 1];
-        this.size--;
-
-        this.heapify(i);
-        return;
-      }
+    if (i === -1) {
+      return;
     }
-  }
+
+    arr[i] = arr[--size];
+    heapify(i);
+  };
+
+  const clear = () => {
+    size = 0;
+  };
+
+  const all = () => {
+    return arr.slice(0, size);
+  };
+
+  return {
+    all,
+    clear,
+    contains,
+    dequeue,
+    enqueue,
+    peek,
+    remove,
+    size: () => size,
+  };
 }

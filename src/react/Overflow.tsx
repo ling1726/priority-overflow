@@ -4,7 +4,10 @@ import {
   mergeClasses,
   shorthands,
 } from "@fluentui/react-components";
-import { useOverflowContainer } from "./useOverflowContainer";
+import {
+  defaultUpdateVisibilityCallback,
+  useOverflowContainer,
+} from "./useOverflowContainer";
 import { OverflowContext } from "./overflowContext";
 import {
   OnUpdateOverflow,
@@ -75,6 +78,7 @@ export const Overflow = React.forwardRef<HTMLDivElement, OverflowProps>(
         overflowAxis,
         padding,
         minimumVisible,
+        onUpdateItemVisibility: defaultUpdateVisibilityCallback,
       }
     );
 

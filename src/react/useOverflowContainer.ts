@@ -1,5 +1,6 @@
 import React from "react";
 import {
+  createOverflowManager,
   ObserveOptions,
   OnUpdateItemVisibility,
   OnUpdateOverflow,
@@ -12,7 +13,7 @@ export interface useOverflowContainerOptions extends ObserveOptions {}
 
 export const useOverflowContainer = (
   update: OnUpdateOverflow,
-  options: useOverflowContainerOptions = {}
+  options: Omit<useOverflowContainerOptions, "onUpdateOverflow">
 ) => {
   const {
     overflowAxis,
@@ -24,8 +25,8 @@ export const useOverflowContainer = (
   // DOM ref to the overflow container element
   const containerRef = React.useRef<HTMLDivElement>(null);
   const updateOverflowItems = useEventCallback(update);
-  const [overflowManager] = React.useState<OverflowManager>(
-    () => new OverflowManager(updateOverflowItems)
+  const [overflowManager] = React.useState<OverflowManager>(() =>
+    createOverflowManager()
   );
 
   React.useLayoutEffect(() => {
@@ -38,8 +39,8 @@ export const useOverflowContainer = (
       overflowAxis,
       padding,
       minimumVisible,
-      onUpdateItemVisibility:
-        onUpdateItemVisibility ?? defaultUpdateVisibilityCallback,
+      onUpdateItemVisibility,
+      onUpdateOverflow: updateOverflowItems,
     });
 
     return () => {
@@ -68,7 +69,7 @@ export const useOverflowContainer = (
   );
 
   const updateOverflow = React.useCallback(() => {
-    overflowManager.updateOverflow();
+    overflowManager.update();
   }, [overflowManager]);
 
   return {
@@ -78,7 +79,7 @@ export const useOverflowContainer = (
   };
 };
 
-const defaultUpdateVisibilityCallback: OnUpdateItemVisibility = ({
+export const defaultUpdateVisibilityCallback: OnUpdateItemVisibility = ({
   item,
   visible,
 }) => {
